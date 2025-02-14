@@ -13,12 +13,9 @@ class Participantes:
     db_name = path + r'/Participantes.db'
     actualiza = None
     def __init__(self, master=None):
-        # Otras variables para funcionalidades varias
-        self.last_entry = ""
 
         # Top Level - Ventana Principal
-        self.win = tk.Tk() if master is None else tk.Toplevel()
-        
+        self.win = tk.Tk() if master is None else tk.Toplevel()      
              
         #Top Level - Configuración
         self.win.configure(background="#d5f5e3", height="480", relief="flat", width="1024")
@@ -46,7 +43,6 @@ class Participantes:
         self.entryId.configure(exportselection="false", justify="left",relief="groove", takefocus=True, width="30")
         self.entryId.grid(column="1", row="0", sticky="w")
         self.entryId.bind("<KeyRelease>", self.valida_Identificacion)
-        
         
         #Label Nombre
         self.lblNombre = ttk.Label(self.lblfrm_Datos)
@@ -128,9 +124,8 @@ class Participantes:
         self.entryFecha.configure(exportselection="true", justify="left",relief="groove", width="30")
         self.entryFecha.grid(column="1", row="7", sticky="w")
         self.entryFecha.bind("<BackSpace>", lambda event: self.valida_Fecha(True))
-        self.entryFecha.bind("<KeyRelease>", lambda event: self.valida_Fecha(False))
+        self.entryFecha.bind("<Key>", lambda event: self.valida_Fecha(False))
         
-          
         #Configuración del Label Frame    
         self.lblfrm_Datos.configure(height="410", relief="groove", text=" Inscripción ", width="330")
         self.lblfrm_Datos.place(anchor="nw", relx="0.01", rely="0.05", width="280", x="0", y="0")
@@ -220,16 +215,19 @@ class Participantes:
     def valida_Fecha(self, borrando, event=None, fecha_completa=False):
         '''Valida que la fecha insertada sea válida y le da formato DD-MM-AAAA'''
 
+        # Borra la fecha si es mayor a 10 caracteres
         if len(self.entryFecha.get()) >= 10:
             self.entryFecha.delete(10, 'end')
             fecha_completa = True
 
+        # Inserta los guiones en la fecha
         if not borrando:
             if len(self.entryFecha.get()) == 2:
                 self.entryFecha.insert(2, '-')
             elif len(self.entryFecha.get()) == 5:
                 self.entryFecha.insert(5, '-')
 
+        # Valida la fecha
         if self.entryFecha.get() != "":
             if fecha_completa:
                 try:
@@ -242,6 +240,8 @@ class Participantes:
             return True
         
     def valida_Celular(self, event=None):
+        '''Valida que el celular no tenga más de 10 dígitos y que sean números'''
+
         try:
             int(self.entryCelular.get())
             if len(self.entryCelular.get()) >= 10:
@@ -281,7 +281,7 @@ class Participantes:
             conn.commit()
         return result
     
-    def lee_Dptos(self, event=None):
+    def lee_Dptos(self):
         '''Carga los datos de la BD dentro de las opciones de la lista de departamentos'''
         
         # Seleccionando los datos de la DB
@@ -296,7 +296,7 @@ class Participantes:
     def lee_listaCiudades(self, event=None):
         '''Carga los datos de la BD dentro de las opciones de la lista de ciudades dependiendo del departamento seleccionado'''
         
-        # Seleccionando los datos de la DB si ya se ha seleccionado dpto
+        # Seleccionando los datos de la DB si ya se ha seleccionado el departamento
         self.entryCiudad.configure(state='readonly')
         query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ? ORDER BY Nombre_Ciudad'
         parametro = (self.entryDpto.get(),)
@@ -304,14 +304,15 @@ class Participantes:
         self.ciudades = [row[0] for row in db_rows]
         self.entryCiudad['values'] = self.ciudades
 
-    def filtradoOpciones(self, event):
+    def filtradoOpciones(self, event=None):
         '''Filtra las opciones de las ciudades a medida que el usuario digita el nombre de la ciudad'''
+
         # Manteniendo la lista desplegada
-        #self.entryCiudad.focus_set()
-        #self.entryCiudad.event_generate('<Down>')
+        self.entryCiudad.focus_set()
+        self.entryCiudad.event_generate('<Down>')
 
         entry = self.entryCiudad.get().lower()
-        # Si se vacea el campo de búsqueda, vuelven las opciones originales de las ciudades
+        # Si se limpia el campo de búsqueda, vuelven las opciones originales de las ciudades
         if not entry:
             self.entryCiudad["values"] = self.ciudades
             self.entryCiudad.set('')
@@ -322,18 +323,24 @@ class Participantes:
 
     def lee_tablaTreeView(self):
         ''' Carga los datos de la BD y Limpia la Tabla tablaTreeView '''
+
+        # Limpia la tabla
         tabla_TreeView = self.treeDatos.get_children()
         for linea in tabla_TreeView:
             self.treeDatos.delete(linea)
+
         # Seleccionando los datos de la BD
         query = 'SELECT * FROM t_participantes ORDER BY Id DESC'
         db_rows = self.run_Query(query)
+
         # Insertando los datos de la BD en la tabla de la pantalla
         for row in db_rows:
             self.treeDatos.insert('',0, text = row[0], values = [row[1],row[2],row[3],row[4],row[5],row[6]])
         
     def adiciona_Registro(self, event=None):
         '''Adiciona un producto a la BD si la validación es True'''
+
+        # Actualiza un registro si la variable actualiza es True
         if self.actualiza:
             self.actualiza = None
             self.entryId.configure(state = 'readonly')
@@ -343,10 +350,12 @@ class Participantes:
             self.run_Query(query, parametros)
             mssg.showinfo('Ok',' Registro actualizado con éxito')
             self.limpia_Campos()
+        # Adiciona un nuevo registro si la variable actualiza es False
         else:
             query = 'INSERT INTO t_participantes VALUES(?, ?, ?, ?, ?, ?, ?)'
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
                           self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get())
+            # Valida que el Id no esté vacío
             if self.valida():
                 try:
                     self.run_Query(query, parametros)
@@ -356,9 +365,13 @@ class Participantes:
                     mssg.showerror("¡Error!", "No puede guardar más de un registro con el mismo Id")
             elif not self.valida():
                 mssg.showerror("¡ Atención !","No puede dejar la identificación vacía")
+        # Actualiza la tabla
         self.lee_tablaTreeView()
 
     def edita_tablaTreeView(self, event=None):
+        '''Edita un registro seleccionado de la tabla'''
+
+        # Valida que se haya seleccionado un registro
         try:
             # Carga los campos desde la tabla TreeView
             self.treeDatos.item(self.treeDatos.selection())['text']
@@ -372,8 +385,11 @@ class Participantes:
         
     def elimina_Registro(self, event=None):
         '''Elimina un registro seleccionado de la base de datos'''
+
+        # Valida que se haya seleccionado un registro
         try:
-            for registro in self.treeDatos.selection(): # Itera sobre cada elemento seleccionado
+            # Elimina el registro seleccionado
+            for registro in self.treeDatos.selection():
                 parametro = (self.treeDatos.item(registro)['text'],)
                 query = 'DELETE FROM t_participantes WHERE Id = ?'
                 self.run_Query(query, parametro)
@@ -382,9 +398,10 @@ class Participantes:
         except:
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
 
+        # Actualiza la tabla
         self.lee_tablaTreeView()
             
-
+# Inicio de la aplicación
 if __name__ == "__main__":
     app = Participantes()
     app.run()
