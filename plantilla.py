@@ -304,23 +304,6 @@ class Participantes:
         self.ciudades = [row[0] for row in db_rows]
         self.entryCiudad['values'] = self.ciudades
 
-    def filtradoOpciones(self, event=None):
-        '''Filtra las opciones de las ciudades a medida que el usuario digita el nombre de la ciudad'''
-
-        # Manteniendo la lista desplegada
-        self.entryCiudad.focus_set()
-        self.entryCiudad.event_generate('<Down>')
-
-        entry = self.entryCiudad.get().lower()
-        # Si se limpia el campo de búsqueda, vuelven las opciones originales de las ciudades
-        if not entry:
-            self.entryCiudad["values"] = self.ciudades
-            self.entryCiudad.set('')
-        #Filtrando opciones de búsqueda.
-        else:
-            ciudades_filtradas = [ciudad for ciudad in self.ciudades if entry in ciudad.lower()]
-            self.entryCiudad["values"] = ciudades_filtradas
-
     def lee_tablaTreeView(self):
         ''' Carga los datos de la BD y Limpia la Tabla tablaTreeView '''
 
