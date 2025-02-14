@@ -212,7 +212,7 @@ class Participantes:
         else:
               self.entryId.delete(15,"end")
 
-    def valida_Fecha(self, borrando, event=None, fecha_completa=False):
+    def valida_Fecha(self, borrando=False, event=None, fecha_completa=False):
         '''Valida que la fecha insertada sea válida y le da formato DD-MM-AAAA'''
 
         # Borra la fecha si es mayor a 10 caracteres
@@ -339,7 +339,7 @@ class Participantes:
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
                           self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get())
             # Valida que el Id no esté vacío
-            if self.valida():
+            if self.valida() and self.valida_Fecha():
                 try:
                     self.run_Query(query, parametros)
                     mssg.showinfo('',f'Registro: {self.entryId.get()} ... agregado')
