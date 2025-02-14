@@ -133,29 +133,30 @@ class Participantes:
 
         # Creacion de un estilo para los botones
         self.btn_style = ttk.Style()
-        self.btn_style.configure("TButton", font=("Helvetica", 8, "bold"), background="#f8bbd0")
+        self.btn_style.configure("TButton", font=("SegoeUI", 8, "bold"))
+        self.btn_style.map("TButton", background=[('pressed', '#f06292'), ('active', '#f06292'), ('focus', '#f06292')])
         
         #Botón Grabar
         self.btnGrabar = ttk.Button(self.win)
-        self.btnGrabar.configure(state="normal", text="Grabar", width="9", takefocus=False, style="TButton")
+        self.btnGrabar.configure(state="normal", text="Grabar", width="9", style="TButton")
         self.btnGrabar.place(anchor="nw", relx="0.01", rely="0.75", x="0", y="75")
         self.btnGrabar.bind("<1>", self.adiciona_Registro, add="+")
         
         #Botón Editar
         self.btnEditar = ttk.Button(self.win)
-        self.btnEditar.configure(text="Editar", width="9", takefocus=False, style="TButton")
+        self.btnEditar.configure(text="Editar", width="9", style="TButton")
         self.btnEditar.place(anchor="nw", rely="0.75", x="80", y="75")
         self.btnEditar.bind("<1>", self.edita_tablaTreeView, add="+")
         
         #Botón Eliminar
         self.btnEliminar = ttk.Button(self.win)
-        self.btnEliminar.configure(text="Eliminar", width="9", takefocus=False, style="TButton")
+        self.btnEliminar.configure(text="Eliminar", width="9", style="TButton")
         self.btnEliminar.place(anchor="nw", rely="0.75", x="152", y="75")
         self.btnEliminar.bind("<1>", self.elimina_Registro, add="+")
         
         #Botón Cancelar
         self.btnCancelar = ttk.Button(self.win)
-        self.btnCancelar.configure(text="Cancelar", width="9",command = self.limpia_Campos, takefocus=False, style="TButton")
+        self.btnCancelar.configure(text="Cancelar", width="9",command=self.limpia_Campos, style="TButton")
         self.btnCancelar.place(anchor="nw", rely="0.75", x="225", y="75")
         
         #tablaTreeView
