@@ -130,28 +130,33 @@ class Participantes:
         self.lblfrm_Datos.configure(height="410", relief="groove", text=" Inscripción ", width="330")
         self.lblfrm_Datos.place(anchor="nw", relx="0.01", rely="0.05", width="280", x="0", y="0")
         self.lblfrm_Datos.grid_propagate(0)
+
+        # Creacion de un estilo para los botones
+        self.btn_style = ttk.Style()
+        self.btn_style.configure("TButton", font=("SegoeUI", 8, "bold"))
+        self.btn_style.map("TButton", background=[('pressed', '#f06292'), ('active', '#f06292'), ('focus', '#f06292')])
         
         #Botón Grabar
         self.btnGrabar = ttk.Button(self.win)
-        self.btnGrabar.configure(state="normal", text="Grabar", width="9", takefocus=False)
+        self.btnGrabar.configure(state="normal", text="Grabar", width="9", style="TButton")
         self.btnGrabar.place(anchor="nw", relx="0.01", rely="0.75", x="0", y="75")
         self.btnGrabar.bind("<1>", self.adiciona_Registro, add="+")
         
         #Botón Editar
         self.btnEditar = ttk.Button(self.win)
-        self.btnEditar.configure(text="Editar", width="9", takefocus=False)
+        self.btnEditar.configure(text="Editar", width="9", style="TButton")
         self.btnEditar.place(anchor="nw", rely="0.75", x="80", y="75")
         self.btnEditar.bind("<1>", self.edita_tablaTreeView, add="+")
         
         #Botón Eliminar
         self.btnEliminar = ttk.Button(self.win)
-        self.btnEliminar.configure(text="Eliminar", width="9", takefocus=False)
+        self.btnEliminar.configure(text="Eliminar", width="9", style="TButton")
         self.btnEliminar.place(anchor="nw", rely="0.75", x="152", y="75")
         self.btnEliminar.bind("<1>", self.elimina_Registro, add="+")
         
         #Botón Cancelar
         self.btnCancelar = ttk.Button(self.win)
-        self.btnCancelar.configure(text="Cancelar", width="9",command = self.limpia_Campos, takefocus=False)
+        self.btnCancelar.configure(text="Cancelar", width="9",command=self.limpia_Campos, style="TButton")
         self.btnCancelar.place(anchor="nw", rely="0.75", x="225", y="75")
         
         #tablaTreeView
@@ -248,7 +253,7 @@ class Participantes:
                 mssg.showerror('¡Atención!', 'Máximo 10 dígitos')
                 self.entryCelular.delete(10, 'end')  
         except:
-            self.entrCelular.delete(len(self.entrCelular.get())-1, 'end')
+            self.entryCelular.delete(len(self.entryCelular.get())-1, 'end')
 
     def carga_Datos(self):
         ''' Carga los datos en los campos desde el treeView'''
