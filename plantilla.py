@@ -253,7 +253,7 @@ class Participantes:
                 mssg.showerror('¡Atención!', 'Máximo 10 dígitos')
                 self.entryCelular.delete(10, 'end')  
         except:
-            self.entrCelular.delete(len(self.entrCelular.get())-1, 'end')
+            self.entryCelular.delete(len(self.entrCelular.get())-1, 'end')
 
     def carga_Datos(self):
         ''' Carga los datos en los campos desde el treeView'''
