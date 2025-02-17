@@ -403,7 +403,7 @@ class Participantes:
         '''Elimina un registro seleccionado de la base de datos'''
 
         # Valida que se haya seleccionado un registro
-        try:
+        if self.treeDatos.selection():
             # Elimina el registro seleccionado
             for registro in self.treeDatos.selection():
                 parametro = (self.treeDatos.item(registro)['text'],)
@@ -411,7 +411,7 @@ class Participantes:
                 self.run_Query(query, parametro)
                 self.limpia_Campos()
             mssg.showinfo("", "¡El registro ha sido eliminado con éxito!")
-        except:
+        else:
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
 
         # Actualiza la tabla
