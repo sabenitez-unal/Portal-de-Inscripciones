@@ -277,7 +277,10 @@ class Participantes:
         self.entryId.insert(0,self.treeDatos.item(self.treeDatos.selection())['text'])
         self.entryId.configure(state = 'readonly')
         self.entryNombre.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][0])
-        self.entryCiudad.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][1])
+        
+        # Carga los datos de la ciudad y el departamento de manera especial
+        self.carga_ciudad_dpto()
+
         self.entryDireccion.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][2])
         self.entryCelular.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][3])
         self.entryEntidad.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][4])
@@ -294,6 +297,7 @@ class Participantes:
             self.entryDpto.set(row[0])
 
         # Cargando la ciudad
+        self.entryCiudad['state'] = 'readonly'
         self.entryCiudad.set(self.treeDatos.item(self.treeDatos.selection())['values'][1])
               
     def limpia_Campos(self):
