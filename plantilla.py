@@ -18,19 +18,19 @@ class Participantes:
         self.win = tk.Tk() if master is None else tk.Toplevel()      
              
         #Top Level - Configuración
-        self.win.configure(background="#d5f5e3", height="480", relief="flat", width="1024")
+        self.win.configure(background="Cadetblue3", height="480", relief="flat", width="1024")
         self.win.geometry("1024x480")
         self.path = self.path +r'/cubo.ico'
         self.win.iconbitmap(self.path)
         self.win.resizable(False, False)
-        self.win.title("Portal de Inscripciones")
+        self.win.title("Conferencia MACSS y la ingeniería de Requerimientos")
         self.win.pack_propagate(0) 
         
         # Main widget
         self.mainwindow = self.win
         
         #Label Frame
-        self.lblfrm_Datos = tk.LabelFrame(self.win, width= 600, height= 200, labelanchor= "n", 
+        self.lblfrm_Datos = tk.LabelFrame(self.win, width= 600, height= 200, labelanchor= "n",
                                           font= ("Helvetica", 13,"bold"))
         #Label Id
         self.lblId = ttk.Label(self.lblfrm_Datos)
@@ -58,8 +58,8 @@ class Participantes:
         #Label Departamento
         self.lblDpto = ttk.Label(self.lblfrm_Datos)
         self.lblDpto.configure(anchor="e", font="TkTextFont", justify="left", text="Departamento")
-        self.lblDpto.configure(width="12")
-        self.lblDpto.grid(column="0", padx="5", pady="15", row="2", sticky="w")
+        self.lblDpto.configure(width="13")
+        self.lblDpto.grid(column="0", padx="3", pady="15", row="2", sticky="w")
 
         #Entry Departamento
         self.lee_Dptos()
@@ -125,6 +125,7 @@ class Participantes:
         self.entryFecha.grid(column="1", row="7", sticky="w")
         self.entryFecha.bind("<BackSpace>", lambda event: self.valida_Fecha(True))
         self.entryFecha.bind("<Key>", lambda event: self.valida_Fecha(False))
+        self.entryFecha.insert(0, "DD/MM/AA")  # Texto por defecto
         
         #Configuración del Label Frame    
         self.lblfrm_Datos.configure(height="410", relief="groove", text=" Inscripción ", width="330")
@@ -133,9 +134,9 @@ class Participantes:
 
         # Creacion de un estilo para los botones
         self.btn_style = ttk.Style()
-        self.btn_style.configure("TButton", font=("SegoeUI", 8, "bold"))
-        self.btn_style.map("TButton", background=[('pressed', '#f06292'), ('active', '#f06292'), ('focus', '#f06292')])
-        
+        self.btn_style.configure("TButton", font=("SegoeUI", 8, "bold") , background ='#4682B4')
+        self.btn_style.map("TButton", background=[('active', 'turquoise1'), ('!pressed', '#4682B4')]) 
+                      
         #Botón Grabar
         self.btnGrabar = ttk.Button(self.win)
         self.btnGrabar.configure(state="normal", text="Grabar", width="9", style="TButton")
@@ -271,8 +272,9 @@ class Participantes:
         self.entryId.configure(state='normal')
         self.entryId.delete(0, 'end')
         self.entryNombre.delete(0, 'end')
-        self.entryDpto.delete(0, 'end')
-        self.entryCiudad.delete(0, 'end')
+        self.entryDpto.set("")
+        self.entryCiudad.set("")
+        self.entryCiudad["state"] = "disabled" 
         self.entryDireccion.delete(0, 'end')
         self.entryEntidad.delete(0, 'end')
         self.entryCelular.delete(0, 'end')
@@ -302,12 +304,16 @@ class Participantes:
         '''Carga los datos de la BD dentro de las opciones de la lista de ciudades dependiendo del departamento seleccionado'''
         
         # Seleccionando los datos de la DB si ya se ha seleccionado el departamento
+        parametro = (self.entryDpto.get(),)
+        self.entryCiudad.set("")
+
         self.entryCiudad.configure(state='readonly')
         query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ? ORDER BY Nombre_Ciudad'
-        parametro = (self.entryDpto.get(),)
+        
         db_rows = self.run_Query(query, parametro)
         self.ciudades = [row[0] for row in db_rows]
         self.entryCiudad['values'] = self.ciudades
+        
 
     def lee_tablaTreeView(self):
         ''' Carga los datos de la BD y Limpia la Tabla tablaTreeView '''
@@ -338,6 +344,7 @@ class Participantes:
             self.run_Query(query, parametros)
             mssg.showinfo('Ok',' Registro actualizado con éxito')
             self.limpia_Campos()
+            
         # Adiciona un nuevo registro si la variable actualiza es False
         else:
             query = 'INSERT INTO t_participantes VALUES(?, ?, ?, ?, ?, ?, ?)'
@@ -355,7 +362,7 @@ class Participantes:
                 mssg.showerror("¡ Atención !","No puede dejar la identificación vacía")
         # Actualiza la tabla
         self.lee_tablaTreeView()
-
+        
     def edita_tablaTreeView(self, event=None):
         '''Edita un registro seleccionado de la tabla'''
 
