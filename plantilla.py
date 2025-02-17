@@ -311,7 +311,9 @@ class Participantes:
         query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ? ORDER BY Nombre_Ciudad'
         
         db_rows = self.run_Query(query, parametro)
-        self.ciudades = [row[0] for row in db_rows]        
+        self.ciudades = [row[0] for row in db_rows]
+        self.entryCiudad['values'] = self.ciudades
+        
 
     def lee_tablaTreeView(self):
         ''' Carga los datos de la BD y Limpia la Tabla tablaTreeView '''
