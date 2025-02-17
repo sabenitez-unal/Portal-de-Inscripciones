@@ -277,11 +277,28 @@ class Participantes:
         self.entryId.insert(0,self.treeDatos.item(self.treeDatos.selection())['text'])
         self.entryId.configure(state = 'readonly')
         self.entryNombre.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][0])
-        self.entryCiudad.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][1])
+        
+        # Carga los datos de la ciudad y el departamento de manera especial
+        self.carga_ciudad_dpto()
+
         self.entryDireccion.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][2])
         self.entryCelular.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][3])
         self.entryEntidad.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][4])
         self.entryFecha.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][5])
+
+    def carga_ciudad_dpto(self):
+        '''Carga los datos en los campos de ciudad y departamento'''
+        
+        # Cargando los datos de la DB para el departamento según la ciudad dada
+        query = 'SELECT Nombre_Departamento FROM t_ciudades WHERE Nombre_Ciudad = ?'
+        parametro = (self.treeDatos.item(self.treeDatos.selection())['values'][1],)
+        db_rows = self.run_Query(query, parametro)
+        for row in db_rows:
+            self.entryDpto.set(row[0])
+
+        # Cargando la ciudad
+        self.entryCiudad['state'] = 'readonly'
+        self.entryCiudad.set(self.treeDatos.item(self.treeDatos.selection())['values'][1])
               
     def limpia_Campos(self):
         '''Limpia los campos de entrada de los datos'''
@@ -388,16 +405,15 @@ class Participantes:
         '''Edita un registro seleccionado de la tabla'''
 
         # Valida que se haya seleccionado un registro
-        try:
+        if self.treeDatos.selection():
             # Carga los campos desde la tabla TreeView
             self.treeDatos.item(self.treeDatos.selection())['text']
             self.limpia_Campos()
             self.actualiza = True # Esta variable controla la actualización
             self.carga_Datos()
-        except IndexError as error:
+        else:
             self.actualiza = None
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
-            return
         
     def elimina_Registro(self, event=None):
         '''Elimina un registro seleccionado de la base de datos'''
