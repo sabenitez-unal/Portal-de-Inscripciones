@@ -120,13 +120,16 @@ class Participantes:
         self.lblFecha.grid(column="0", padx="5", pady="15", row="7", sticky="w")
         
         #Entry Fecha
-        self.entryFecha = tk.Entry(self.lblfrm_Datos)
+        self.entryFecha = tk.Entry(self.lblfrm_Datos,foreground="gray55")
         self.entryFecha.configure(exportselection="true", justify="left",relief="groove", width="30")
         self.entryFecha.grid(column="1", row="7", sticky="w")
         self.entryFecha.bind("<BackSpace>", lambda event: self.valida_Fecha(True))
         self.entryFecha.bind("<Key>", lambda event: self.valida_Fecha(False))
-        self.entryFecha.insert(0, "DD/MM/AA")  # Texto por defecto
-        
+
+        self.entryFecha.insert(0,"DD-MM-AAAA")
+        self.entryFecha.bind("<FocusIn>",self.borrar_fecha)
+        self.entryFecha.bind("<FocusOut>",self.reescribir_fecha)
+
         #Configuración del Label Frame    
         self.lblfrm_Datos.configure(height="410", relief="groove", text=" Inscripción ", width="330")
         self.lblfrm_Datos.place(anchor="nw", relx="0.01", rely="0.05", width="280", x="0", y="0")
@@ -244,6 +247,19 @@ class Participantes:
                     self.entryFecha.delete(9, 'end')
         else:
             return True
+
+
+    def borrar_fecha(self,event):
+        Fecha = self.entryFecha.get()
+        if Fecha == "DD-MM-AAAA":
+            self.entryFecha.configure(foreground="#000000")
+            self.entryFecha.delete(0,tk.END)
+
+    def reescribir_fecha(self,event):
+        Fecha = self.entryFecha.get()
+        if len(Fecha)== 0:
+            self.entryFecha.insert(0,"DD-MM-AAAA")
+            self.entryFecha.configure(foreground="gray55")
         
     def valida_Celular(self, event=None):
         '''Valida que el celular no tenga más de 10 dígitos y que sean números'''
@@ -272,13 +288,19 @@ class Participantes:
         self.entryId.configure(state='normal')
         self.entryId.delete(0, 'end')
         self.entryNombre.delete(0, 'end')
+
         self.entryDpto.set("")
         self.entryCiudad.set("")
         self.entryCiudad["state"] = "disabled" 
+
         self.entryDireccion.delete(0, 'end')
         self.entryEntidad.delete(0, 'end')
         self.entryCelular.delete(0, 'end')
+
         self.entryFecha.delete(0, 'end')
+        self.entryFecha.configure(foreground="gray55")
+        self.entryFecha.insert(0,"DD-MM-AAAA")
+        self.entryFecha.bind("<FocusIn>",self.borrar_fecha,)
 
     def run_Query(self, query, parametros = ()):
         ''' Función para ejecutar los Querys a la base de datos '''
@@ -313,7 +335,6 @@ class Participantes:
         db_rows = self.run_Query(query, parametro)
         self.ciudades = [row[0] for row in db_rows]
         self.entryCiudad['values'] = self.ciudades
-        
 
     def lee_tablaTreeView(self):
         ''' Carga los datos de la BD y Limpia la Tabla tablaTreeView '''
