@@ -290,7 +290,8 @@ class Participantes:
         query = 'SELECT Nombre_Departamento FROM t_ciudades WHERE Nombre_Ciudad = ?'
         parametro = (self.treeDatos.item(self.treeDatos.selection())['values'][1],)
         db_rows = self.run_Query(query, parametro)
-        self.entryDpto.set(db_rows[0][0])
+        for row in db_rows:
+            self.entryDpto.set(row[0])
 
         # Cargando la ciudad
         self.entryCiudad.set(self.treeDatos.item(self.treeDatos.selection())['values'][1])
