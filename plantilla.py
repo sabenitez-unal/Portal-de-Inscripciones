@@ -23,7 +23,7 @@ class Participantes:
         self.path = self.path +r'/cubo.ico'
         self.win.iconbitmap(self.path)
         self.win.resizable(False, False)
-        self.win.title("Conferencia MACSS y la ingeniería de Requerimientos")
+        self.win.title("Portal de Inscripciones")
         self.win.pack_propagate(0) 
         
         # Main widget
