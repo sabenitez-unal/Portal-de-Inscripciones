@@ -282,6 +282,10 @@ class Participantes:
         self.entryCelular.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][3])
         self.entryEntidad.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][4])
         self.entryFecha.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][5])
+
+    def carga_ciudad_dpto(self):
+        '''Carga los datos en los campos de ciudad y departamento'''
+        pass
               
     def limpia_Campos(self):
         '''Limpia los campos de entrada de los datos'''
@@ -388,16 +392,15 @@ class Participantes:
         '''Edita un registro seleccionado de la tabla'''
 
         # Valida que se haya seleccionado un registro
-        try:
+        if self.treeDatos.selection():
             # Carga los campos desde la tabla TreeView
             self.treeDatos.item(self.treeDatos.selection())['text']
             self.limpia_Campos()
             self.actualiza = True # Esta variable controla la actualización
             self.carga_Datos()
-        except IndexError as error:
+        else:
             self.actualiza = None
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
-            return
         
     def elimina_Registro(self, event=None):
         '''Elimina un registro seleccionado de la base de datos'''
