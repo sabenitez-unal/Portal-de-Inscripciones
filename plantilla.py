@@ -129,6 +129,7 @@ class Participantes:
         #Coloca un texto traslucido para guiar al usuario con el form de fecha       
         self.resetform_fecha()
 
+
         #Configuración del Label Frame    
         self.lblfrm_Datos.configure(height="410", relief="groove", text=" Inscripción ", width="330")
         self.lblfrm_Datos.place(anchor="nw", relx="0.01", rely="0.05", width="280", x="0", y="0")
@@ -202,8 +203,7 @@ class Participantes:
  
     def valida(self):
         '''Valida que el Id no esté vacio, devuelve True si ok'''
-        llenarId = len(self.entryId.get()) != 0
-        return(llenarId)
+        return(len(self.entryId.get()) != 0)
 
     def run(self):
         self.mainwindow.mainloop()
@@ -226,9 +226,9 @@ class Participantes:
 
         # Borra la fecha si es mayor a 10 caracteres
         if len(self.entryFecha.get()) >= 10:
-            self.entryFecha.delete(10,'end')
+            self.entryFecha.delete(10, 'end')
             fecha_completa = True
-        
+
         # Inserta los guiones en la fecha
         if not borrando:
             if len(self.entryFecha.get()) == 2:
@@ -237,37 +237,36 @@ class Participantes:
                 self.entryFecha.insert(5, '-')
 
         # Valida la fecha
-        if len(self.entryFecha.get()) != 0:
+        if self.entryFecha.get() != "":
             if fecha_completa:
                 try:
                     dt.strptime(self.entryFecha.get(), '%d-%m-%Y')
                     self.resetform_fecha() #reestablece form de fecha al mostrar error
                     return True
                 except:
-                        mssg.showerror("¡Error!", "Inserte una fecha válida en formato DD-MM-AAAA, por favor.")
-                        self.resetform_fecha() #se restablece el entry de fecha al mostrar error              
+                    mssg.showerror("¡Error!", "Inserte una fecha válida, por favor.")
+                    self.entryFecha.delete(11, 'end')  
         else:
+            
             return True
-    
-    #reestablece el formato del entryfecha cada vez que sea necesario
+
+     #reestablece el formato del entryfecha cada vez que sea necesario
     def resetform_fecha (self,event = None):
         self.entryFecha.delete(0,'end')
         self.entryFecha.configure(foreground="gray55")
         self.entryFecha.insert(0, "DD-MM-AAAA")
         self.entryFecha.bind("<FocusIn>",self.borrar_fecha)
         self.entryFecha.bind("<FocusOut>",self.reescribir_fecha)
-        
+
     #borra el text de form de fecha cuando el usuario empieza a digitar
     def borrar_fecha(self,event):
-        Fecha = self.entryFecha.get()
-        if Fecha == "DD-MM-AAAA":
+        if self.entryFecha.get() == "DD-MM-AAAA":
             self.entryFecha.configure(foreground="#000000")
             self.entryFecha.delete(0,tk.END)
 
-    #reescribe el form de fecha si el usuario deja el campo vacío
+    #reescribe el form de fecha si el usuario deja el campo vacio
     def reescribir_fecha(self,event):
-        Fecha = self.entryFecha.get()
-        if len(Fecha)== 0:
+        if len(self.entryFecha.get())== 0:
             self.entryFecha.insert(0,"DD-MM-AAAA")
             self.entryFecha.configure(foreground="gray55")
         
@@ -291,7 +290,6 @@ class Participantes:
         # Carga los datos de la ciudad y el departamento de manera especial
         self.carga_ciudad_dpto()
 
-        self.entryCiudad.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][1])
         self.entryDireccion.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][2])
         self.entryCelular.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][3])
         self.entryEntidad.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][4])
@@ -306,6 +304,7 @@ class Participantes:
         db_rows = self.run_Query(query, parametro)
         for row in db_rows:
             self.entryDpto.set(row[0])
+
         # Cargando la ciudad
         self.entryCiudad['state'] = 'readonly'
         self.entryCiudad.set(self.treeDatos.item(self.treeDatos.selection())['values'][1])
@@ -318,14 +317,13 @@ class Participantes:
 
         self.entryDpto.set("")
         self.entryCiudad.set("")
-        self.entryCiudad["state"] = "disabled" #vuelve a deshabilitar el entryciudad al actualizar
+        self.entryCiudad["state"] = "disabled" 
 
         self.entryDireccion.delete(0, 'end')
         self.entryEntidad.delete(0, 'end')
         self.entryCelular.delete(0, 'end')
-      
-        #elimina el texto del campo fecha y reestablece su formato
-        self.entryFecha.delete(0, 'end')
+
+        self.entryFecha.delete(0, 'end')    #elimina el texto del campo fecha y reestablece su formato
         self.resetform_fecha()
 
     def run_Query(self, query, parametros = ()):
@@ -390,14 +388,14 @@ class Participantes:
                         self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.entryId.get())
             self.run_Query(query, parametros)
             mssg.showinfo('Ok',' Registro actualizado con éxito')
-            self.limpia_Campos() #limpua los campos al actualizar
+            self.limpia_Campos()
             
         # Adiciona un nuevo registro si la variable actualiza es False
         else:
             query = 'INSERT INTO t_participantes VALUES(?, ?, ?, ?, ?, ?, ?)'
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
                           self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get())
-            # Valida que el Id no esté vacío y la fecha sea valida
+            # Valida que el Id no esté vacío
             if self.valida() and self.valida_Fecha():
                 try:
                     self.run_Query(query, parametros)
@@ -405,41 +403,32 @@ class Participantes:
                     self.limpia_Campos()
                 except:
                     mssg.showerror("¡Error!", "No puede guardar más de un registro con el mismo Id")
-                    self.resetform_fecha() #despues del mensaje de error restablece el entryFecha
-
             elif not self.valida():
                 mssg.showerror("¡ Atención !","No puede dejar la identificación vacía")
-                self.resetform_fecha()
-        
         # Actualiza la tabla
         self.lee_tablaTreeView()
         
     def edita_tablaTreeView(self, event=None):
-        '''Edita un registro seleccionado de la tabla'''
-
+        '''Edita un registro seleccionado de la tabla'''   
         # Valida que se haya seleccionado un registro
-        try:
+        if self.treeDatos.selection():
             # Carga los campos desde la tabla TreeView
             self.treeDatos.item(self.treeDatos.selection())['text']
-            self.limpia_Campos()
-
-            self.entryFecha.delete(0, 'end') #borra el form de fecha y escribe la fecha guardada
+            
+            self.entryFecha.delete(0, tk.END) #borra el form de fecha y escribe la fecha guardada
             self.entryFecha.configure(foreground="#000000") 
 
             self.actualiza = True # Esta variable controla la actualización
             self.carga_Datos()
-            
-        except IndexError as error:
+        else:
             self.actualiza = None
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
-            self.resetform_fecha()  #reestablece fecha cuando hay error en editar
-            return
+        
         
     def elimina_Registro(self, event=None):
         '''Elimina un registro seleccionado de la base de datos'''
-
         # Valida que se haya seleccionado un registro
-        try:
+        if self.treeDatos.selection():
             # Elimina el registro seleccionado
             for registro in self.treeDatos.selection():
                 parametro = (self.treeDatos.item(registro)['text'],)
@@ -447,10 +436,9 @@ class Participantes:
                 self.run_Query(query, parametro)
                 self.limpia_Campos()
             mssg.showinfo("", "¡El registro ha sido eliminado con éxito!")
-        except:
+        else:
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
-        #reestablece fecha 
-        self.limpia_Campos()
+
         # Actualiza la tabla
         self.lee_tablaTreeView()
             
