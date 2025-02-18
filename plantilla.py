@@ -225,10 +225,10 @@ class Participantes:
         '''Valida que la fecha insertada sea válida y le da formato DD-MM-AAAA'''
 
         # Borra la fecha si es mayor a 10 caracteres
-        if len(self.entryFecha.get()) == 10:
-            self.entryFecha.delete(11,'end')
+        if len(self.entryFecha.get()) >= 10:
+            self.entryFecha.delete(10,'end')
             fecha_completa = True
-
+        
         # Inserta los guiones en la fecha
         if not borrando:
             if len(self.entryFecha.get()) == 2:
@@ -241,10 +241,11 @@ class Participantes:
             if fecha_completa:
                 try:
                     dt.strptime(self.entryFecha.get(), '%d-%m-%Y')
+                    self.resetform_fecha() #reestablece form de fecha al mostrar error
                     return True
                 except:
                         mssg.showerror("¡Error!", "Inserte una fecha válida en formato DD-MM-AAAA, por favor.")
-                        self.resetform_fecha()
+                        self.resetform_fecha() #se restablece el entry de fecha al mostrar error              
         else:
             return True
     
@@ -404,7 +405,7 @@ class Participantes:
                     self.limpia_Campos()
                 except:
                     mssg.showerror("¡Error!", "No puede guardar más de un registro con el mismo Id")
-                    self.resetform_fecha()
+                    self.resetform_fecha() #despues del mensaje de error restablece el entryFecha
 
             elif not self.valida():
                 mssg.showerror("¡ Atención !","No puede dejar la identificación vacía")
@@ -431,7 +432,7 @@ class Participantes:
         except IndexError as error:
             self.actualiza = None
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
-            self.resetform_fecha()
+            self.resetform_fecha()  #reestablece fecha cuando hay error en editar
             return
         
     def elimina_Registro(self, event=None):
@@ -448,6 +449,7 @@ class Participantes:
             mssg.showinfo("", "¡El registro ha sido eliminado con éxito!")
         except:
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
+        #reestablece fecha 
         self.limpia_Campos()
         # Actualiza la tabla
         self.lee_tablaTreeView()
