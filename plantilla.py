@@ -201,11 +201,9 @@ class Participantes:
         self.treeDatos.place(anchor="nw", height="400", rely="0.1", width="700", x="300", y="0")
  
     def valida(self):
-        '''Valida que el Id y fecha no estén vacios, devuelve True si ok'''
-        FormFecha = "DD-MM-AAAA"
+        '''Valida que el Id no esté vacio, devuelve True si ok'''
         llenarId = len(self.entryId.get()) != 0
-        llenarFecha = str(self.entryFecha.get()) != FormFecha #valida que el entry fecha no esté vacío
-        return(llenarId & llenarFecha)
+        return(llenarId)
 
     def run(self):
         self.mainwindow.mainloop()
@@ -227,8 +225,8 @@ class Participantes:
         '''Valida que la fecha insertada sea válida y le da formato DD-MM-AAAA'''
 
         # Borra la fecha si es mayor a 10 caracteres
-        if len(self.entryFecha.get()) >= 10:
-            self.entryFecha.delete(9, 'end')
+        if len(self.entryFecha.get()) == 10:
+            self.entryFecha.delete(11,'end')
             fecha_completa = True
 
         # Inserta los guiones en la fecha
@@ -239,20 +237,20 @@ class Participantes:
                 self.entryFecha.insert(5, '-')
 
         # Valida la fecha
-        if self.entryFecha.get() != "":
+        if len(self.entryFecha.get()) != 0:
             if fecha_completa:
                 try:
                     dt.strptime(self.entryFecha.get(), '%d-%m-%Y')
                     return True
                 except:
-                    mssg.showerror("¡Error!", "Inserte una fecha válida en formato DD-MM-AAAA, por favor.")
-                    self.entryFecha.delete(0, 'end')
-                    self.resetform_fecha()
+                        mssg.showerror("¡Error!", "Inserte una fecha válida en formato DD-MM-AAAA, por favor.")
+                        self.resetform_fecha()
         else:
             return True
     
     #reestablece el formato del entryfecha cada vez que sea necesario
     def resetform_fecha (self,event = None):
+        self.entryFecha.delete(0,'end')
         self.entryFecha.configure(foreground="gray55")
         self.entryFecha.insert(0, "DD-MM-AAAA")
         self.entryFecha.bind("<FocusIn>",self.borrar_fecha)
@@ -288,11 +286,28 @@ class Participantes:
         self.entryId.insert(0,self.treeDatos.item(self.treeDatos.selection())['text'])
         self.entryId.configure(state = 'readonly')
         self.entryNombre.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][0])
+        
+        # Carga los datos de la ciudad y el departamento de manera especial
+        self.carga_ciudad_dpto()
+
         self.entryCiudad.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][1])
         self.entryDireccion.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][2])
         self.entryCelular.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][3])
         self.entryEntidad.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][4])
         self.entryFecha.insert(0,self.treeDatos.item(self.treeDatos.selection())['values'][5])
+
+    def carga_ciudad_dpto(self):
+        '''Carga los datos en los campos de ciudad y departamento'''
+        
+        # Cargando los datos de la DB para el departamento según la ciudad dada
+        query = 'SELECT Nombre_Departamento FROM t_ciudades WHERE Nombre_Ciudad = ?'
+        parametro = (self.treeDatos.item(self.treeDatos.selection())['values'][1],)
+        db_rows = self.run_Query(query, parametro)
+        for row in db_rows:
+            self.entryDpto.set(row[0])
+        # Cargando la ciudad
+        self.entryCiudad['state'] = 'readonly'
+        self.entryCiudad.set(self.treeDatos.item(self.treeDatos.selection())['values'][1])
               
     def limpia_Campos(self):
         '''Limpia los campos de entrada de los datos'''
@@ -374,14 +389,14 @@ class Participantes:
                         self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.entryId.get())
             self.run_Query(query, parametros)
             mssg.showinfo('Ok',' Registro actualizado con éxito')
-            self.limpia_Campos()
+            self.limpia_Campos() #limpua los campos al actualizar
             
         # Adiciona un nuevo registro si la variable actualiza es False
         else:
             query = 'INSERT INTO t_participantes VALUES(?, ?, ?, ?, ?, ?, ?)'
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
                           self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get())
-            # Valida que el Id no esté vacío
+            # Valida que el Id no esté vacío y la fecha sea valida
             if self.valida() and self.valida_Fecha():
                 try:
                     self.run_Query(query, parametros)
@@ -389,8 +404,12 @@ class Participantes:
                     self.limpia_Campos()
                 except:
                     mssg.showerror("¡Error!", "No puede guardar más de un registro con el mismo Id")
-            else:
-                mssg.showerror("¡ Atención !","No puede dejar la identificación o la fecha vacía")
+                    self.resetform_fecha()
+
+            elif not self.valida():
+                mssg.showerror("¡ Atención !","No puede dejar la identificación vacía")
+                self.resetform_fecha()
+        
         # Actualiza la tabla
         self.lee_tablaTreeView()
         
@@ -412,6 +431,7 @@ class Participantes:
         except IndexError as error:
             self.actualiza = None
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
+            self.resetform_fecha()
             return
         
     def elimina_Registro(self, event=None):
