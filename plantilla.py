@@ -224,7 +224,7 @@ class Participantes:
     def valida_Fecha(self, borrando=False):
         '''Valida que la fecha insertada sea válida y le da formato DD-MM-AAAA'''
 
-        # Inserta los guiones en la fecha automaticamente
+        # Inserta los guiones en la fecha de forma automatica
         if not borrando:
             if len(self.entryFecha.get()) == 2:
                 self.entryFecha.insert(2, '-')
