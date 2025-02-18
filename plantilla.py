@@ -125,7 +125,7 @@ class Participantes:
         self.entryFecha.grid(column="1", row="7", sticky="w")
         self.entryFecha.bind("<BackSpace>", lambda event: self.valida_Fecha(True))
         self.entryFecha.bind("<Key>", lambda event: self.valida_Fecha(False))
-        self.entryFecha.bind("<FocusOut>",self.valida_Fecha())
+
         #Coloca un texto traslucido para guiar al usuario con el form de fecha       
         self.resetform_fecha()
 
