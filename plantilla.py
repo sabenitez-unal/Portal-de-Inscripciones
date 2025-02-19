@@ -282,8 +282,6 @@ class Participantes:
 
     def carga_Datos(self):
         ''' Carga los datos en los campos desde el treeView'''
-        # Primero, libera los datos que existan en los campos
-        self.limpia_Campos()
 
         # Carga los datos en los campos
         self.entryId.insert(0,self.treeDatos.item(self.treeDatos.selection())['text'])
