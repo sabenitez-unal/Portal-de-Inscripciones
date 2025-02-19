@@ -123,12 +123,12 @@ class Participantes:
         self.entryFecha = tk.Entry(self.lblfrm_Datos,foreground="gray55")
         self.entryFecha.configure(exportselection="true", justify="left",relief="groove", width="30")
         self.entryFecha.grid(column="1", row="7", sticky="w")
-        self.entryFecha.bind("<BackSpace>", lambda event: self.valida_Fecha(True))
-        self.entryFecha.bind("<Key>", lambda event: self.valida_Fecha(False))
+        self.entryFecha.bind("<BackSpace>", lambda event: self.valida_Fecha(True)) #valida fecha al borrar con backSpace
+        self.entryFecha.bind("<Key>", lambda event: self.valida_Fecha(False)) #valida fecha al tocar cualquier tecla
+        
+        #Coloca un texto traslucido para guiar al usuario con el form de fecha       
+        self.resetform_fecha()
 
-        self.entryFecha.insert(0,"DD-MM-AAAA")
-        self.entryFecha.bind("<FocusIn>",self.borrar_fecha)
-        self.entryFecha.bind("<FocusOut>",self.reescribir_fecha)
 
         #Configuración del Label Frame    
         self.lblfrm_Datos.configure(height="410", relief="groove", text=" Inscripción ", width="330")
@@ -221,43 +221,51 @@ class Participantes:
         else:
               self.entryId.delete(15,"end")
 
-    def valida_Fecha(self, borrando=False, event=None, fecha_completa=False):
+    def valida_Fecha(self, borrando=False):
         '''Valida que la fecha insertada sea válida y le da formato DD-MM-AAAA'''
 
-        # Borra la fecha si es mayor a 10 caracteres
-        if len(self.entryFecha.get()) >= 10:
-            self.entryFecha.delete(10, 'end')
-            fecha_completa = True
-
-        # Inserta los guiones en la fecha
+        # Inserta los guiones en la fecha de forma automatica
         if not borrando:
             if len(self.entryFecha.get()) == 2:
                 self.entryFecha.insert(2, '-')
             elif len(self.entryFecha.get()) == 5:
                 self.entryFecha.insert(5, '-')
 
-        # Valida la fecha
-        if self.entryFecha.get() != "":
-            if fecha_completa:
-                try:
-                    dt.strptime(self.entryFecha.get(), '%d-%m-%Y')
-                    return True
-                except:
-                    mssg.showerror("¡Error!", "Inserte una fecha válida, por favor.")
-                    self.entryFecha.delete(9, 'end')
-        else:
-            return True
+        # Obtener el texto del Entry
+        fecha_texto = self.entryFecha.get()    
+        
+        if (fecha_texto == "DD-MM-AAAA"):
+            return False  # Si no hay nada escrito, la fecha es inválida
+        
+        #verifica que la fecha no sea mayor a 11 caracteres
+        if len(fecha_texto) > 10:
+            mssg.showerror("¡Error!", "Inserte una fecha válida, por favor.")
+            self.entryFecha.delete(0, tk.END)  
+        
+        try:
+        # Intentar convertir el texto a un objeto datetime
+            dt.strptime(fecha_texto, "%d-%m-%Y")  # Formato esperado: DD-MM-YYYY
+            return True 
+        except ValueError:
+            return False  # Si hay error, la fecha es inválida    
 
+    #reestablece el formato del entryfecha cada vez que sea necesario
+    def resetform_fecha (self,event = None):
+        self.entryFecha.delete(0,'end')
+        self.entryFecha.configure(foreground="gray55")
+        self.entryFecha.insert(0, "DD-MM-AAAA")
+        self.entryFecha.bind("<FocusIn>",self.borrar_fecha)
+        self.entryFecha.bind("<FocusOut>",self.reescribir_fecha)
 
+    #borra el text de form de fecha cuando el usuario empieza a digitar
     def borrar_fecha(self,event):
-        Fecha = self.entryFecha.get()
-        if Fecha == "DD-MM-AAAA":
+        if self.entryFecha.get() == "DD-MM-AAAA":
             self.entryFecha.configure(foreground="#000000")
             self.entryFecha.delete(0,tk.END)
 
+    #reescribe el form de fecha si el usuario deja el campo vacio
     def reescribir_fecha(self,event):
-        Fecha = self.entryFecha.get()
-        if len(Fecha)== 0:
+        if len(self.entryFecha.get())== 0:
             self.entryFecha.insert(0,"DD-MM-AAAA")
             self.entryFecha.configure(foreground="gray55")
         
@@ -274,8 +282,6 @@ class Participantes:
 
     def carga_Datos(self):
         ''' Carga los datos en los campos desde el treeView'''
-        # Primero, libera los datos que existan en los campos
-        self.limpia_Campos()
 
         # Carga los datos en los campos
         self.entryId.insert(0,self.treeDatos.item(self.treeDatos.selection())['text'])
@@ -318,11 +324,11 @@ class Participantes:
         self.entryEntidad.delete(0, 'end')
         self.entryCelular.delete(0, 'end')
 
-        self.entryFecha.delete(0, 'end')
-        self.entryFecha.configure(foreground="gray55")
-        self.entryFecha.insert(0,"DD-MM-AAAA")
-        self.entryFecha.bind("<FocusIn>",self.borrar_fecha,)
+        self.entryFecha.delete(0, 'end')    #elimina el texto del campo fecha y reestablece su formato
+        self.resetform_fecha()
 
+        self.actualiza = None  # Reiniciar la variable para evitar confusión en grabado
+        
     def run_Query(self, query, parametros = ()):
         ''' Función para ejecutar los Querys a la base de datos '''
         with sqlite3.connect(self.db_name) as conn:
@@ -377,7 +383,7 @@ class Participantes:
         '''Adiciona un producto a la BD si la validación es True'''
 
         # Actualiza un registro si la variable actualiza es True
-        if self.actualiza:
+        if self.actualiza and self.valida_Fecha():
             self.actualiza = None
             self.entryId.configure(state = 'readonly')
             query = 'UPDATE t_participantes SET Id = ?,Nombre = ?,Ciudad = ?,Direccion = ?,Celular = ?, Entidad = ?, Fecha = ? WHERE Id = ?'
@@ -392,7 +398,7 @@ class Participantes:
             query = 'INSERT INTO t_participantes VALUES(?, ?, ?, ?, ?, ?, ?)'
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
                           self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get())
-            # Valida que el Id no esté vacío
+            # Valida que el Id no esté vacío y la fecha sea valida
             if self.valida() and self.valida_Fecha():
                 try:
                     self.run_Query(query, parametros)
@@ -402,26 +408,32 @@ class Participantes:
                     mssg.showerror("¡Error!", "No puede guardar más de un registro con el mismo Id")
             elif not self.valida():
                 mssg.showerror("¡ Atención !","No puede dejar la identificación vacía")
+
+            elif not self.valida_Fecha():
+                mssg.showerror("¡ Atención !","Debe completar el campo de fecha con una fecha valida en formato DD-MM-AAAA")
+                self.resetform_fecha()
         # Actualiza la tabla
         self.lee_tablaTreeView()
         
     def edita_tablaTreeView(self, event=None):
-        '''Edita un registro seleccionado de la tabla'''
-
+        '''Edita un registro seleccionado de la tabla'''   
         # Valida que se haya seleccionado un registro
         if self.treeDatos.selection():
             # Carga los campos desde la tabla TreeView
             self.treeDatos.item(self.treeDatos.selection())['text']
-            self.limpia_Campos()
+            
+            self.entryFecha.delete(0, tk.END) #borra el form de fecha y escribe la fecha guardada
+            self.entryFecha.configure(foreground="#000000") 
+
             self.actualiza = True # Esta variable controla la actualización
             self.carga_Datos()
         else:
             self.actualiza = None
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
         
+        
     def elimina_Registro(self, event=None):
         '''Elimina un registro seleccionado de la base de datos'''
-
         # Valida que se haya seleccionado un registro
         if self.treeDatos.selection():
             # Elimina el registro seleccionado
