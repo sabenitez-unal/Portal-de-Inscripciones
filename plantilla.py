@@ -324,10 +324,12 @@ class Participantes:
         self.entryEntidad.delete(0, 'end')
         self.entryCelular.delete(0, 'end')
 
-        self.entryFecha.delete(0, 'end')    #elimina el texto del campo fecha y reestablece su formato
+        # limina el texto del campo fecha y reestablece su formato
+        self.entryFecha.delete(0, 'end')
         self.resetform_fecha()
 
-        self.actualiza = None  # Reiniciar la variable para evitar confusión en grabado
+        # Reiniciar la variable para evitar confusión en grabado
+        self.actualiza = None
         
     def run_Query(self, query, parametros = ()):
         ''' Función para ejecutar los Querys a la base de datos '''
@@ -422,7 +424,9 @@ class Participantes:
             # Carga los campos desde la tabla TreeView
             self.treeDatos.item(self.treeDatos.selection())['text']
             
-            self.entryFecha.delete(0, tk.END) #borra el form de fecha y escribe la fecha guardada
+            # Limpiar los campos si hay datos en ellos
+            self.limpia_Campos()
+            self.entryFecha.delete(0, 'end')
             self.entryFecha.configure(foreground="#000000") 
 
             self.actualiza = True # Esta variable controla la actualización
