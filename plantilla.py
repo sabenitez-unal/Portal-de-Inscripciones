@@ -325,6 +325,8 @@ class Participantes:
         self.entryFecha.delete(0, 'end')    #elimina el texto del campo fecha y reestablece su formato
         self.resetform_fecha()
 
+        self.actualiza = None  # Reiniciar la variable para evitar confusión en grabado
+        
     def run_Query(self, query, parametros = ()):
         ''' Función para ejecutar los Querys a la base de datos '''
         with sqlite3.connect(self.db_name) as conn:
@@ -379,7 +381,7 @@ class Participantes:
         '''Adiciona un producto a la BD si la validación es True'''
 
         # Actualiza un registro si la variable actualiza es True
-        if self.actualiza:
+        if self.actualiza and self.valida_Fecha():
             self.actualiza = None
             self.entryId.configure(state = 'readonly')
             query = 'UPDATE t_participantes SET Id = ?,Nombre = ?,Ciudad = ?,Direccion = ?,Celular = ?, Entidad = ?, Fecha = ? WHERE Id = ?'
