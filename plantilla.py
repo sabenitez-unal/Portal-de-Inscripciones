@@ -426,15 +426,15 @@ class Participantes:
             # Valida que el Id no esté vacío y la fecha sea valida
             if self.valida() and self.valida_Fecha():
                 # Intenta insertar el registro
-                #try:
+                try:
                     self.run_Query(query, parametros)
                     # Actualiza el id de la ciudad ya teniendo el registro en la tabla t_participantes.
                     self.leer_idCiudad()
                     mssg.showinfo('',f'Registro: {self.entryId.get()} ... agregado')
                     self.limpia_Campos()
                 # Si el Id ya existe, muestra un mensaje de error
-                #except:
-                #    mssg.showerror("¡Error!", "No puede guardar más de un registro con el mismo Id")
+                except:
+                    mssg.showerror("¡Error!", "No puede guardar más de un registro con el mismo Id")
             # Si el Id está vacío, se muestra un mensaje de error
             elif not self.valida():
                 mssg.showerror("¡ Atención !","No puede dejar la identificación vacía")
