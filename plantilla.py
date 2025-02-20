@@ -398,6 +398,11 @@ class Participantes:
             query = 'SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ?'
             parametro = (self.entryCiudad.get(),)
             db_rows = self.run_Query(query, parametro)
+            # Actualiza el Id de la ciudad en la tabla de participantes
+            for row in db_rows:
+                query = 'UPDATE t_participantes SET Id_Ciudad = ? WHERE Id = ?'
+                parametros = (row[0], self.entryId.get())
+                self.run_Query(query, parametros)
 
             mssg.showinfo('Ok',' Registro actualizado con éxito')
             self.limpia_Campos()
