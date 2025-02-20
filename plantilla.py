@@ -427,6 +427,8 @@ class Participantes:
                 # Intenta insertar el registro
                 try:
                     self.run_Query(query, parametros)
+                    # Actualiza el id de la ciudad
+                    self.leer_idCiudad()
                     mssg.showinfo('',f'Registro: {self.entryId.get()} ... agregado')
                     self.limpia_Campos()
                 # Si el Id ya existe, muestra un mensaje de error
