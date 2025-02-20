@@ -380,6 +380,20 @@ class Participantes:
         # Insertando los datos de la BD en la tabla de la pantalla
         for row in db_rows:
             self.treeDatos.insert('',0, text = row[0], values = [row[1],row[2],row[3],row[4],row[5],row[6]])
+
+    def leer_idCiudad(self):
+        '''Lee el Id de la ciudad seleccionada'''
+        
+        # Busca en la db el id de la ciudad seleccionada
+        query = 'SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ?'
+        parametro = (self.entryCiudad.get(),)
+        db_rows = self.run_Query(query, parametro)
+        # Retorna el id de la ciudad y lo actualiza dentro de la tabla t_participantes
+        for row in db_rows:
+            query = 'UPDATE t_participantes SET Id_Ciudad = ? WHERE Id = ?'
+            parametros = (row[0], self.entryId.get())
+            self.run_Query(query, parametros)
+
         
     def adiciona_Registro(self, event=None):
         '''Adiciona un producto a la BD si la validación es True'''
@@ -389,40 +403,36 @@ class Participantes:
             self.actualiza = None
             self.entryId.configure(state = 'readonly')
 
+            # Se actualiza el registro
             query = 'UPDATE t_participantes SET Id = ?,Nombre = ?,Ciudad = ?,Direccion = ?,Celular = ?, Entidad = ?, Fecha = ? WHERE Id = ?'
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
                         self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.entryId.get())
             self.run_Query(query, parametros)
 
-            # Busca en la db el id de la ciudad seleccionada
-            query = 'SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ?'
-            parametro = (self.entryCiudad.get(),)
-            db_rows = self.run_Query(query, parametro)
-            # Actualiza el Id de la ciudad en la tabla de participantes
-            for row in db_rows:
-                query = 'UPDATE t_participantes SET Id_Ciudad = ? WHERE Id = ?'
-                parametros = (row[0], self.entryId.get())
-                self.run_Query(query, parametros)
-
+            # Se muestra un mensaje de confirmación
             mssg.showinfo('Ok',' Registro actualizado con éxito')
             self.limpia_Campos()
             
         # Adiciona un nuevo registro si la variable actualiza es False
         else:
+            # Query para insertar un nuevo registro
             query = 'INSERT INTO t_participantes VALUES(?, ?, ?, ?, ?, ?, ?)'
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
                           self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get())
             # Valida que el Id no esté vacío y la fecha sea valida
             if self.valida() and self.valida_Fecha():
+                # Intenta insertar el registro
                 try:
                     self.run_Query(query, parametros)
                     mssg.showinfo('',f'Registro: {self.entryId.get()} ... agregado')
                     self.limpia_Campos()
+                # Si el Id ya existe, muestra un mensaje de error
                 except:
                     mssg.showerror("¡Error!", "No puede guardar más de un registro con el mismo Id")
+            # Si el Id está vacío, se muestra un mensaje de error
             elif not self.valida():
                 mssg.showerror("¡ Atención !","No puede dejar la identificación vacía")
-
+            # Si la fecha no es válida, se muestra un mensaje de error
             elif not self.valida_Fecha():
                 mssg.showerror("¡ Atención !","Debe completar el campo de fecha con una fecha valida en formato DD-MM-AAAA")
                 self.resetform_fecha()
@@ -443,6 +453,7 @@ class Participantes:
 
             self.actualiza = True # Esta variable controla la actualización
             self.carga_Datos()
+        # Si no se selecciona un registro, muestra un mensaje de error
         else:
             self.actualiza = None
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
@@ -459,6 +470,7 @@ class Participantes:
                 self.run_Query(query, parametro)
                 self.limpia_Campos()
             mssg.showinfo("", "¡El registro ha sido eliminado con éxito!")
+        # Si no se selecciona un registro, muestra un mensaje de error
         else:
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
 
