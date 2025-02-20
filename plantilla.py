@@ -409,6 +409,9 @@ class Participantes:
                         self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.entryId.get())
             self.run_Query(query, parametros)
 
+            # Se actualiza el id_ciudad también
+            self.leer_idCiudad()
+
             # Se muestra un mensaje de confirmación
             mssg.showinfo('Ok',' Registro actualizado con éxito')
             self.limpia_Campos()
