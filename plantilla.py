@@ -392,6 +392,9 @@ class Participantes:
         db_rows = self.run_Query(query, parametro)
         # Retorna el id de la ciudad y lo retorna para guardarlo o actualizarlo en la tabla t_participantes
         for row in db_rows:
+            # Si no hay ciudad seleccionada, se retorna un string vacío
+            if row == None:
+                return ""
             return row[0]
 
         
@@ -404,13 +407,10 @@ class Participantes:
             self.entryId.configure(state = 'readonly')
 
             # Se actualiza el registro
-            query = 'UPDATE t_participantes SET Id = ?,Nombre = ?,Ciudad = ?,Direccion = ?,Celular = ?, Entidad = ?, Fecha = ? WHERE Id = ?'
+            query = 'UPDATE t_participantes SET Id = ?,Nombre = ?,Ciudad = ?,Direccion = ?,Celular = ?, Entidad = ?, Fecha = ?, Id_Ciudad = ? WHERE Id = ?'
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
-                        self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.entryId.get())
+                        self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.leer_idCiudad(), self.entryId.get())
             self.run_Query(query, parametros)
-
-            # Se actualiza el id_ciudad también
-            self.leer_idCiudad()
 
             # Se muestra un mensaje de confirmación
             mssg.showinfo('Ok',' Registro actualizado con éxito')
@@ -421,7 +421,7 @@ class Participantes:
             # Query para insertar un nuevo registro, con id_ciudad vacío para guardarlo despúes.
             query = 'INSERT INTO t_participantes VALUES(?, ?, ?, ?, ?, ?, ?, ?)'
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
-                          self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), "")
+                          self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.leer_idCiudad())
             # Valida que el Id no esté vacío y la fecha sea valida
             if self.valida() and self.valida_Fecha():
                 # Intenta insertar el registro
