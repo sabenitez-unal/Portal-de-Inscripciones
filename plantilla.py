@@ -390,11 +390,9 @@ class Participantes:
         query = 'SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ?'
         parametro = (self.entryCiudad.get(),)
         db_rows = self.run_Query(query, parametro)
-        # Retorna el id de la ciudad y lo actualiza dentro de la tabla t_participantes
+        # Retorna el id de la ciudad y lo retorna para guardarlo o actualizarlo en la tabla t_participantes
         for row in db_rows:
-            query = 'UPDATE t_participantes SET Id_Ciudad = ? WHERE Id = ?'
-            parametros = (row[0], self.entryId.get())
-            self.run_Query(query, parametros)
+            return row[0]
 
         
     def adiciona_Registro(self, event=None):
