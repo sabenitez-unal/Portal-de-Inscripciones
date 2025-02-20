@@ -388,10 +388,17 @@ class Participantes:
         if self.actualiza and self.valida_Fecha():
             self.actualiza = None
             self.entryId.configure(state = 'readonly')
+
             query = 'UPDATE t_participantes SET Id = ?,Nombre = ?,Ciudad = ?,Direccion = ?,Celular = ?, Entidad = ?, Fecha = ? WHERE Id = ?'
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
                         self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.entryId.get())
             self.run_Query(query, parametros)
+
+            # Busca en la db el id de la ciudad seleccionada
+            query = 'SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ?'
+            parametro = (self.entryCiudad.get(),)
+            db_rows = self.run_Query(query, parametro)
+
             mssg.showinfo('Ok',' Registro actualizado con éxito')
             self.limpia_Campos()
             
