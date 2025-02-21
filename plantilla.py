@@ -145,30 +145,30 @@ class Participantes:
                       
         #Botón Grabar
         self.btnGrabar = ttk.Button(self.win, text="Grabar", width="9", style="TButton", command=self.adiciona_Registro, takefocus=False)
-        self.btnGrabar.place(anchor="nw", relx="0.01", rely="0.75", x="0", y="75")
+        self.btnGrabar.place(anchor="nw", relx="0.01", rely="0.75", x="0", y="80")
 
         #Botón Editar
         self.btnEditar = ttk.Button(self.win, text="Editar", width="9", style="TButton", command=self.edita_tablaTreeView, takefocus=False)
-        self.btnEditar.place(anchor="nw", rely="0.75", x="80", y="75")
+        self.btnEditar.place(anchor="nw", rely="0.75", x="80", y="80")
 
         #Botón Eliminar
         self.btnEliminar = ttk.Button(self.win, text="Eliminar", width="9", style="TButton", command=self.elimina_Registro, takefocus=False)
-        self.btnEliminar.place(anchor="nw", rely="0.75", x="152", y="75")
+        self.btnEliminar.place(anchor="nw", rely="0.75", x="152", y="80")
 
         #Botón Cancelar
         self.btnCancelar = ttk.Button(self.win)
         self.btnCancelar.configure(text="Cancelar", width="9",command=self.limpia_Campos, style="TButton")
-        self.btnCancelar.place(anchor="nw", rely="0.75", x="225", y="75")
+        self.btnCancelar.place(anchor="nw", rely="0.75", x="225", y="80")
         
         #Botón Consultar
         self.btnConsultar = ttk.Button(self.win)
         self.btnConsultar.configure(text="Consultar Datos", width="18",command=self.limpia_Campos, style="TButton")
-        self.btnConsultar.place(anchor="nw", rely="0.75", x="770", y="75")
+        self.btnConsultar.place(anchor="nw", rely="0.75", x="770", y="80")
 
         #Botón Cerrar Ventana
         self.btnCerrarV = ttk.Button(self.win)
-        self.btnCerrarV.configure(text="Finalizar Inscripción", width="18",command = self.cerrar_ventana, style="TButton")
-        self.btnCerrarV.place(anchor="nw", rely="0.75", x="895", y="75")
+        self.btnCerrarV.configure(text="Finalizar Inscripción", width="18",command=self.win.destroy, style="TButton")
+        self.btnCerrarV.place(anchor="nw", rely="0.75", x="895", y="80")
 
         #tablaTreeView
         self.style=ttk.Style()
@@ -202,7 +202,7 @@ class Participantes:
         #Scrollbar en el eje Y de treeDatos
         self.scrollbar=ttk.Scrollbar(self.win, orient='vertical', command=self.treeDatos.yview)
         self.treeDatos.configure(yscroll=self.scrollbar.set)
-        self.scrollbar.place(x=1000, y=34, height=398)
+        self.scrollbar.place(x=1000, y=33, height=390)
 
         #Carga los datos en treeDatos
         self.lee_tablaTreeView()    
@@ -220,10 +220,7 @@ class Participantes:
             posicion_y = (screen_height - window_height) // 2
 
             self.win.geometry(f"{window_width}x{window_height}+{posicion_x}+{posicion_y}")
-
-    def cerrar_ventana (self):
-        self.win.destroy()
-        
+ 
     def valida(self):
         '''Valida que el Id no esté vacio, devuelve True si ok'''
         return(len(self.entryId.get()) != 0)
@@ -260,9 +257,9 @@ class Participantes:
             return False  # Si no hay nada escrito, la fecha es inválida
         
         #verifica que la fecha no sea mayor a 10 caracteres
-        if len(fecha_texto) > 9 and not borrando:
+        if len(fecha_texto) > 10 and not borrando:
             mssg.showerror("¡Error!", "Inserte una fecha válida, por favor.")
-            self.entryFecha.delete(9, tk.END)  
+            self.entryFecha.delete(10, tk.END)  
         
         try: # Intentar convertir el texto a un objeto datetime
             dt.strptime(fecha_texto, "%d/%m/%Y")  # Formato esperado: DD/MM/YYYY
@@ -389,6 +386,7 @@ class Participantes:
             self.entryCiudad.configure(state='readonly')
             query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ? ORDER BY Nombre_Ciudad'
             parametro = (self.entryDpto.get(),)
+            self.entryCiudad.set("")
             db_rows = self.run_Query(query, parametro)
             self.ciudades = [row[0] for row in db_rows]
             self.entryCiudad['values'] = self.ciudades
@@ -440,7 +438,7 @@ class Participantes:
         '''Adiciona un producto a la BD si la validación es True'''
 
         # Actualiza un registro si la variable actualiza es True
-        if self.actualiza and self.valida_Fecha():
+        if self.actualiza:
             self.actualiza = None
             self.entryId.configure(state = 'readonly')
 
@@ -477,7 +475,6 @@ class Participantes:
             # Si la fecha no es válida, se muestra un mensaje de error
             elif not self.valida_Fecha():
                 mssg.showerror("¡ Atención !","Debe completar el campo de fecha con una fecha valida en formato DD-MM-AAAA")
-                self.resetform_fecha()
         # Actualiza la tabla
         self.lee_tablaTreeView()
         
