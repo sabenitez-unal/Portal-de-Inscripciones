@@ -229,14 +229,14 @@ class Participantes:
         # Inserta los guiones en la fecha de forma automatica
         if not borrando:
             if len(self.entryFecha.get()) == 2:
-                self.entryFecha.insert(2, '-')
+                self.entryFecha.insert(2, '/')
             elif len(self.entryFecha.get()) == 5:
-                self.entryFecha.insert(5, '-')
+                self.entryFecha.insert(5, '/')
 
         # Obtener el texto del Entry
         fecha_texto = self.entryFecha.get()    
         
-        if (fecha_texto == "DD-MM-AAAA"):
+        if (fecha_texto == "DD/MM/AAAA"):
             return False  # Si no hay nada escrito, la fecha es inválida
         
         #verifica que la fecha no sea mayor a 11 caracteres
@@ -255,20 +255,20 @@ class Participantes:
     def resetform_fecha (self, event=None):
         self.entryFecha.delete(0,'end')
         self.entryFecha.configure(foreground="gray55")
-        self.entryFecha.insert(0, "DD-MM-AAAA")
+        self.entryFecha.insert(0, "DD/MM/AAAA")
         self.entryFecha.bind("<FocusIn>",self.borrar_fecha)
         self.entryFecha.bind("<FocusOut>",self.reescribir_fecha)
 
     #borra el text de form de fecha cuando el usuario empieza a digitar
     def borrar_fecha(self, event):
-        if self.entryFecha.get() == "DD-MM-AAAA":
+        if self.entryFecha.get() == "DD/MM/AAAA":
             self.entryFecha.configure(foreground="#000000")
             self.entryFecha.delete(0,tk.END)
 
     #reescribe el form de fecha si el usuario deja el campo vacio
     def reescribir_fecha(self,event):
         if len(self.entryFecha.get())== 0:
-            self.entryFecha.insert(0,"DD-MM-AAAA")
+            self.entryFecha.insert(0,"DD/MM/AAAA")
             self.entryFecha.configure(foreground="gray55")
         
     def valida_Celular(self, event=None):
