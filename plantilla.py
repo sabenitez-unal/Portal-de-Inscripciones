@@ -395,9 +395,10 @@ class Participantes:
             query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
             parametro = (row[6],)
             ciudad = self.run_Query(query, parametro)
+            # Se obtiene el nombre de la ciudad
             for cd in ciudad:
                 ciudad = cd[0]
-
+            # Se insertan los datos en la tabla
             self.treeDatos.insert('',0, text = row[0], values = [row[1],ciudad,row[2],row[3],row[4],row[5]])
 
     def leer_idCiudad(self):
