@@ -391,7 +391,14 @@ class Participantes:
 
         # Insertando los datos de la BD en la tabla de la pantalla
         for row in db_rows:
-            self.treeDatos.insert('',0, text = row[0], values = [row[1],row[2],row[3],row[4],row[5],row[6]])
+            # Se carga la ciudad correspondiente al id de la ciudad.
+            query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
+            parametro = (row[6],)
+            ciudad = self.run_Query(query, parametro)
+            for cd in ciudad:
+                ciudad = cd[0]
+
+            self.treeDatos.insert('',0, text = row[0], values = [row[1],ciudad,row[2],row[3],row[4],row[5]])
 
     def leer_idCiudad(self):
         '''Lee el Id de la ciudad seleccionada'''
