@@ -159,6 +159,16 @@ class Participantes:
         self.btnCancelar.configure(text="Cancelar", width="9",command=self.limpia_Campos, style="TButton")
         self.btnCancelar.place(anchor="nw", rely="0.75", x="225", y="75")
         
+        #Botón Consultar
+        self.btnConsultar = ttk.Button(self.win)
+        self.btnConsultar.configure(text="Consultar Datos", width="18",command=self.limpia_Campos, style="TButton")
+        self.btnConsultar.place(anchor="nw", rely="0.75", x="770", y="75")
+
+        #Botón Cerrar Ventana
+        self.btnCerrarV = ttk.Button(self.win)
+        self.btnCerrarV.configure(text="Finalizar Inscripción", width="18",command=self.limpia_Campos, style="TButton")
+        self.btnCerrarV.place(anchor="nw", rely="0.75", x="895", y="75")
+
         #tablaTreeView
         self.style=ttk.Style()
         self.style.configure("estilo.Treeview", highlightthickness=0, bd=0, background='AliceBlue', font=('Calibri Light',10))
