@@ -412,6 +412,16 @@ class Participantes:
         # Retorna el id de la ciudad y lo retorna para guardarlo o actualizarlo en la tabla t_participantes
         for row in db_rows:
             return row[0]
+
+    def leer_nombreCiudad(self, id_ciudad):
+        '''Lee el nombre de la ciudad seleccionada'''
+        
+        # Busca en la db el nombre de la ciudad seleccionada
+        query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
+        parametro = (id_ciudad,)
+        db_rows = self.run_Query(query, parametro)
+        ciudad = [row[0] for row in db_rows][0]
+        return ciudad
         
     def adiciona_Registro(self, event=None):
         '''Adiciona un producto a la BD si la validación es True'''
