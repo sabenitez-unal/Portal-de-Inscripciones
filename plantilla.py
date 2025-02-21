@@ -315,11 +315,12 @@ class Participantes:
             self.entryDpto.set(row[0])
 
         # Cargando la ciudad
-        self.entryCiudad['state'] = 'readonly'
         query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
         db_rows = self.run_Query(query, parametro)
         for row in db_rows:
-            self.entryCiudad.set(row[0])
+            if row[0] != '':
+                self.entryCiudad['state'] = 'readonly'
+                self.entryCiudad.set(row[0])
               
     def limpia_Campos(self):
         '''Limpia los campos de entrada de los datos'''
