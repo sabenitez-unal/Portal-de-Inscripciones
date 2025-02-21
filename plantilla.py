@@ -452,7 +452,8 @@ class Participantes:
             # Se muestra un mensaje de confirmación
             mssg.showinfo('Ok',' Registro actualizado con éxito')
             self.limpia_Campos()
-            self.win.focus_set()
+            self.win.focus_set()  #saca el cursor de los entry
+
         # Adiciona un nuevo registro si la variable actualiza es False
         else:
             # Query para insertar un nuevo registro, con id_ciudad vacío para guardarlo despúes.
@@ -519,13 +520,14 @@ class Participantes:
     def consulta_participantes(self):
         """ Filtra el Treeview según el ID, Ciudad, Departamento o Fecha ingresados """
     
-        id_partic = self.entryId.get().strip()         # obtiene info del campo solicitado
-        ciudad = self.entryCiudad.get().strip()        # con .strip() elimina espacios en blanco inecesarios
+        id_partic = self.entryId.get().strip()        # obtiene info del campo solicitado
+        ciudad = self.entryCiudad.get().strip()       # con .strip() elimina espacios en blanco inecesarios
         departamento = self.entryDpto.get().strip()
         fecha = self.entryFecha.get().strip()
+        nombre = self.entryNombre.get().strip()
     
         # Si no se ingresa ningún filtro, mostrará el error
-        if not (id_partic or ciudad or departamento or (fecha != "DD/MM/AAAA")):
+        if not (id_partic or ciudad or departamento or (fecha != "DD/MM/AAAA")  or nombre):
             mssg.showerror("Error", "Por favor, ingrese al menos un criterio de búsqueda")
             return
     
@@ -541,7 +543,7 @@ class Participantes:
             query += " AND Id = ?"   # añade este parametro si se desea buscar participantes por él
             parametros.append(id_partic)
 
-        if fecha:
+        if fecha != "DD/MM/AAAA":  
             query += " AND Fecha = ?"
             parametros.append(fecha)
 
@@ -553,10 +555,14 @@ class Participantes:
             query += " AND Id_Ciudad IN (SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ?)"
             parametros.append(departamento)
 
+        if nombre:
+            query += " AND Nombre = ?"
+            parametros.append(nombre)
+
         # Ejecutar la consulta con los parámetros
         resultado = self.run_Query(query, tuple(parametros))
 
-        participantes = resultado.fetchall()  # Obtener todos los resultados
+        participantes = resultado.fetchall()  # Obtener todos los resultados que tengan el parametro deseado
 
         if participantes:
             for participante in participantes:
