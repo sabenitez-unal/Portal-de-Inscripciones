@@ -313,11 +313,9 @@ class Participantes:
                 self.entryDpto.set(row[0])
 
             # Cargando la ciudad
-            query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
-            db_rows = self.run_Query(query, parametro)
-            for row in db_rows:
-                self.entryCiudad['state'] = 'readonly'
-                self.entryCiudad.set(row[0])
+            ciudad = self.leer_nombreCiudad(id_ciudad)
+            self.entryCiudad['state'] = 'readonly'
+            self.entryCiudad.set(ciudad)
               
     def limpia_Campos(self):
         '''Limpia los campos de entrada de los datos'''
@@ -390,11 +388,7 @@ class Participantes:
         for row in db_rows:
             # Se carga la ciudad correspondiente al id de la ciudad.
             if row[6] != None:
-                # Se carga la ciudad correspondiente al id de la ciudad.
-                query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
-                parametro = (row[6],)
-                ciudad = self.run_Query(query, parametro)
-                ciudad = [cd[0] for cd in ciudad][0]
+                ciudad = self.leer_nombreCiudad(row[6])
             # Si id_ciudad es None, se deja vacío
             else: ciudad = ''
 
@@ -414,7 +408,7 @@ class Participantes:
             return row[0]
 
     def leer_nombreCiudad(self, id_ciudad):
-        '''Lee el nombre de la ciudad seleccionada'''
+        '''Lee el nombre de la ciudad seleccionada según el id de la ciudad'''
         
         # Busca en la db el nombre de la ciudad seleccionada
         query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
