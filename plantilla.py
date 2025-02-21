@@ -203,7 +203,7 @@ class Participantes:
         #Carga los datos en treeDatos
         self.lee_tablaTreeView()    
         self.treeDatos.place(anchor="nw", height="400", rely="0.1", width="700", x="300", y="0")
-        
+
     def centrar_ventana(self): #centra la ventana en el centro de la pantalla
             """ Centra la ventana en la pantalla """
             self.win.update_idletasks()  # Asegura que la ventana tenga las dimensiones correctas
@@ -212,10 +212,10 @@ class Participantes:
             window_width = self.win.winfo_width()
             window_height = self.win.winfo_height()
     
-            x_position = (screen_width - window_width) // 2
-            y_position = (screen_height - window_height) // 2
+            posicion_x = (screen_width - window_width) // 2
+            posicion_y = (screen_height - window_height) // 2
 
-            self.win.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
+            self.win.geometry(f"{window_width}x{window_height}+{posicion_x}+{posicion_y}")
  
     def valida(self):
         '''Valida que el Id no esté vacio, devuelve True si ok'''
