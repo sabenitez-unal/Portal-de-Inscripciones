@@ -246,7 +246,7 @@ class Participantes:
         
         try:
         # Intentar convertir el texto a un objeto datetime
-            dt.strptime(fecha_texto, "%d-%m-%Y")  # Formato esperado: DD-MM-YYYY
+            dt.strptime(fecha_texto, "%d/%m/%Y")  # Formato esperado: DD/MM/YYYY
             return True 
         except ValueError:
             return False  # Si hay error, la fecha es inválida    
