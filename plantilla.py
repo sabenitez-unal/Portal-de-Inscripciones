@@ -157,12 +157,12 @@ class Participantes:
 
         #Botón Cancelar
         self.btnCancelar = ttk.Button(self.win)
-        self.btnCancelar.configure(text="Cancelar", width="9",command=self.limpia_Campos, style="TButton")
+        self.btnCancelar.configure(text="Cancelar", width="9",command=lambda : [self.limpia_Campos(), self.lee_tablaTreeView()], style="TButton")
         self.btnCancelar.place(anchor="nw", rely="0.75", x="225", y="80")
         
         #Botón Consultar
         self.btnConsultar = ttk.Button(self.win)
-        self.btnConsultar.configure(text="Consultar Datos", width="18",command=self.limpia_Campos, style="TButton")
+        self.btnConsultar.configure(text="Consultar Datos", width="18",command=self.consulta_participantes, style="TButton")
         self.btnConsultar.place(anchor="nw", rely="0.75", x="770", y="80")
 
         #Botón Cerrar Ventana
@@ -438,7 +438,7 @@ class Participantes:
         '''Adiciona un producto a la BD si la validación es True'''
 
         # Actualiza un registro si la variable actualiza es True
-        if self.actualiza:
+        if self.actualiza and self.valida_Fecha():
             self.actualiza = None
             self.entryId.configure(state = 'readonly')
 
@@ -452,7 +452,7 @@ class Participantes:
             # Se muestra un mensaje de confirmación
             mssg.showinfo('Ok',' Registro actualizado con éxito')
             self.limpia_Campos()
-            
+            self.win.focus_set()
         # Adiciona un nuevo registro si la variable actualiza es False
         else:
             # Query para insertar un nuevo registro, con id_ciudad vacío para guardarlo despúes.
@@ -476,6 +476,7 @@ class Participantes:
             elif not self.valida_Fecha():
                 mssg.showerror("¡ Atención !","Debe completar el campo de fecha con una fecha valida en formato DD-MM-AAAA")
         # Actualiza la tabla
+        self.win.focus_set()
         self.lee_tablaTreeView()
         
     def edita_tablaTreeView(self, event=None):
@@ -514,6 +515,65 @@ class Participantes:
 
         # Actualiza la tabla
         self.lee_tablaTreeView()
+    
+    def consulta_participantes(self):
+        """ Filtra el Treeview según el ID, Ciudad, Departamento o Fecha ingresados """
+    
+        id_partic = self.entryId.get().strip()         # obtiene info del campo solicitado
+        ciudad = self.entryCiudad.get().strip()        # con .strip() elimina espacios en blanco inecesarios
+        departamento = self.entryDpto.get().strip()
+        fecha = self.entryFecha.get().strip()
+    
+        # Si no se ingresa ningún filtro, mostrará el error
+        if not (id_partic or ciudad or departamento or (fecha != "DD/MM/AAAA")):
+            mssg.showerror("Error", "Por favor, ingrese al menos un criterio de búsqueda")
+            return
+    
+        # Limpia el Treeview antes de mostrar resultados
+        for item in self.treeDatos.get_children():
+            self.treeDatos.delete(item)
+
+        # Construir la consulta dinámica según los filtros ingresados
+        query = "SELECT * FROM t_participantes WHERE 1=1"
+        parametros = [] # en esta tupla gurada el o los parámetos a consultar
+
+        if id_partic:
+            query += " AND Id = ?"   # añade este parametro si se desea buscar participantes por él
+            parametros.append(id_partic)
+
+        if fecha:
+            query += " AND Fecha = ?"
+            parametros.append(fecha)
+
+        if ciudad:
+            query += " AND Id_Ciudad IN (SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ?)"
+            parametros.append(ciudad)
+
+        if departamento:
+            query += " AND Id_Ciudad IN (SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ?)"
+            parametros.append(departamento)
+
+        # Ejecutar la consulta con los parámetros
+        resultado = self.run_Query(query, tuple(parametros))
+
+        participantes = resultado.fetchall()  # Obtener todos los resultados
+
+        if participantes:
+            for participante in participantes:
+                # Obtener la ciudad correspondiente al ID_Ciudad
+                ciudad_nombre = ""
+                if participante[6] is not None:
+                    query = "SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?"
+                    ciudad_result = self.run_Query(query, (participante[6],)).fetchone()
+                    ciudad_nombre = ciudad_result[0] if ciudad_result else ""
+
+                # Insertar el participante en el Treeview
+                self.treeDatos.insert("", "end", text=participante[0], values=[    #coloca la info de cada columna del participante
+                    participante[1], ciudad_nombre, participante[2], participante[3], participante[4], participante[5]
+            ])
+        else:
+            self.lee_tablaTreeView()
+            mssg.showinfo("Sin resultados", "No se encontraron participantes con los criterios ingresados")
             
 # Inicio de la aplicación
 if __name__ == "__main__":
