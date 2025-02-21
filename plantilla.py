@@ -307,18 +307,19 @@ class Participantes:
         db_rows = self.run_Query(query, parametro)
         id_ciudad = [row[0] for row in db_rows][0]
         
-        # Cargando los datos de la DB para el departamento según el id de la ciudad
-        query = 'SELECT Nombre_Departamento FROM t_ciudades WHERE Id_Ciudad = ?'
-        parametro = (id_ciudad,)
-        db_rows = self.run_Query(query, parametro)
-        for row in db_rows:
-            self.entryDpto.set(row[0])
+        # Si hay un id de ciudad, se cargan los datos
+        if id_ciudad != None:
+            # Cargando los datos de la DB para el departamento según el id de la ciudad
+            query = 'SELECT Nombre_Departamento FROM t_ciudades WHERE Id_Ciudad = ?'
+            parametro = (id_ciudad,)
+            db_rows = self.run_Query(query, parametro)
+            for row in db_rows:
+                self.entryDpto.set(row[0])
 
-        # Cargando la ciudad
-        query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
-        db_rows = self.run_Query(query, parametro)
-        for row in db_rows:
-            if row[0] != '':
+            # Cargando la ciudad
+            query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
+            db_rows = self.run_Query(query, parametro)
+            for row in db_rows:
                 self.entryCiudad['state'] = 'readonly'
                 self.entryCiudad.set(row[0])
               
@@ -366,16 +367,18 @@ class Participantes:
     def lee_listaCiudades(self, event=None):
         '''Carga los datos de la BD dentro de las opciones de la lista de ciudades dependiendo del departamento seleccionado'''
         
-        # Seleccionando los datos de la DB si ya se ha seleccionado el departamento
-        parametro = (self.entryDpto.get(),)
-        self.entryCiudad.set("")
+        # Si el departamento no está vacío, se cargan las ciudades
+        if self.entryDpto.get() != "":
+            # Seleccionando los datos de la DB si ya se ha seleccionado el departamento
+            parametro = (self.entryDpto.get(),)
+            self.entryCiudad.set("")
 
-        self.entryCiudad.configure(state='readonly')
-        query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ? ORDER BY Nombre_Ciudad'
-        
-        db_rows = self.run_Query(query, parametro)
-        self.ciudades = [row[0] for row in db_rows]
-        self.entryCiudad['values'] = self.ciudades
+            self.entryCiudad.configure(state='readonly')
+            query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ? ORDER BY Nombre_Ciudad'
+            
+            db_rows = self.run_Query(query, parametro)
+            self.ciudades = [row[0] for row in db_rows]
+            self.entryCiudad['values'] = self.ciudades
 
     def lee_tablaTreeView(self):
         ''' Carga los datos de la BD y Limpia la Tabla tablaTreeView '''
@@ -392,12 +395,15 @@ class Participantes:
         # Insertando los datos de la BD en la tabla de la pantalla
         for row in db_rows:
             # Se carga la ciudad correspondiente al id de la ciudad.
-            query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
-            parametro = (row[6],)
-            ciudad = self.run_Query(query, parametro)
-            # Se obtiene el nombre de la ciudad
-            for cd in ciudad:
-                ciudad = cd[0]
+            if row[6] != None:
+                # Se carga la ciudad correspondiente al id de la ciudad.
+                query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
+                parametro = (row[6],)
+                ciudad = self.run_Query(query, parametro)
+                ciudad = [cd[0] for cd in ciudad][0]
+            # Si id_ciudad es None, se deja vacío
+            else: ciudad = ''
+
             # Se insertan los datos en la tabla
             self.treeDatos.insert('',0, text = row[0], values = [row[1],ciudad,row[2],row[3],row[4],row[5]])
 
@@ -443,8 +449,6 @@ class Participantes:
                 # Intenta insertar el registro
                 try:
                     self.run_Query(query, parametros)
-                    # Actualiza el id de la ciudad ya teniendo el registro en la tabla t_participantes.
-                    self.leer_idCiudad()
                     mssg.showinfo('',f'Registro: {self.entryId.get()} ... agregado')
                     self.limpia_Campos()
                 # Si el Id ya existe, muestra un mensaje de error
@@ -474,6 +478,7 @@ class Participantes:
 
             self.actualiza = True # Esta variable controla la actualización
             self.carga_Datos()
+            self.lee_listaCiudades()
         # Si no se selecciona un registro, muestra un mensaje de error
         else:
             self.actualiza = None
