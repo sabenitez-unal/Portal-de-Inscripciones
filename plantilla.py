@@ -142,31 +142,16 @@ class Participantes:
         self.btn_style.map("TButton", background=[('active', 'turquoise1'), ('!pressed', '#4682B4')]) 
                       
         #Botón Grabar
-        #self.btnGrabar = ttk.Button(self.win)
-        #self.btnGrabar.configure(state="normal", text="Grabar", width="9", style="TButton")
-        #self.btnGrabar.place(anchor="nw", relx="0.01", rely="0.75", x="0", y="75")
-        #self.btnGrabar.bind("<1>", self.adiciona_Registro, add="+")
-
         self.btnGrabar = ttk.Button(self.win, text="Grabar", width="9", style="TButton", command=self.adiciona_Registro, takefocus=False)
         self.btnGrabar.place(anchor="nw", relx="0.01", rely="0.75", x="0", y="75")
 
         
         #Botón Editar
-        #self.btnEditar = ttk.Button(self.win)
-        #self.btnEditar.configure(text="Editar", width="9", style="TButton")
-        #self.btnEditar.place(anchor="nw", rely="0.75", x="80", y="75")
-        #self.btnEditar.bind("<1>", self.edita_tablaTreeView, add="+")
-
         self.btnEditar = ttk.Button(self.win, text="Editar", width="9", style="TButton", command=self.edita_tablaTreeView, takefocus=False)
         self.btnEditar.place(anchor="nw", rely="0.75", x="80", y="75")
 
         
         #Botón Eliminar
-        #self.btnEliminar = ttk.Button(self.win)
-        #self.btnEliminar.configure(text="Eliminar", width="9", style="TButton")
-        #self.btnEliminar.place(anchor="nw", rely="0.75", x="152", y="75")
-        #self.btnEliminar.bind("<1>", self.elimina_Registro, add="+")
-        
         self.btnEliminar = ttk.Button(self.win, text="Eliminar", width="9", style="TButton", command=self.elimina_Registro, takefocus=False)
         self.btnEliminar.place(anchor="nw", rely="0.75", x="152", y="75")
 
