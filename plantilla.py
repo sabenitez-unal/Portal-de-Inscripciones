@@ -18,8 +18,8 @@ class Participantes:
         self.win = tk.Tk() if master is None else tk.Toplevel()      
              
         #Top Level - Configuración
-        self.win.configure(background="Cadetblue3", height="480", relief="flat", width="1024")
-        self.win.geometry("1024x480")
+        self.win.configure(background="Cadetblue3", height="500", relief="flat", width="1024")
+        self.win.geometry("1024x500")
         self.path = self.path +r'/cubo.ico'
         self.win.iconbitmap(self.path)
         self.win.resizable(False, False)
@@ -137,6 +137,7 @@ class Participantes:
         self.lblfrm_Datos.place(anchor="nw", relx="0.01", rely="0.05", width="280", x="0", y="0")
         self.lblfrm_Datos.grid_propagate(0)
 
+        #estilo para los botones
         self.btn_style = ttk.Style()
         self.btn_style.configure("TButton", font=("SegoeUI", 8, "bold") , background ='#4682B4')
         self.btn_style.map("TButton", background=[('active', 'turquoise1'), ('!pressed', '#4682B4')]) 
@@ -145,17 +146,14 @@ class Participantes:
         self.btnGrabar = ttk.Button(self.win, text="Grabar", width="9", style="TButton", command=self.adiciona_Registro, takefocus=False)
         self.btnGrabar.place(anchor="nw", relx="0.01", rely="0.75", x="0", y="75")
 
-        
         #Botón Editar
         self.btnEditar = ttk.Button(self.win, text="Editar", width="9", style="TButton", command=self.edita_tablaTreeView, takefocus=False)
         self.btnEditar.place(anchor="nw", rely="0.75", x="80", y="75")
 
-        
         #Botón Eliminar
         self.btnEliminar = ttk.Button(self.win, text="Eliminar", width="9", style="TButton", command=self.elimina_Registro, takefocus=False)
         self.btnEliminar.place(anchor="nw", rely="0.75", x="152", y="75")
 
-        
         #Botón Cancelar
         self.btnCancelar = ttk.Button(self.win)
         self.btnCancelar.configure(text="Cancelar", width="9",command=self.limpia_Campos, style="TButton")
@@ -193,11 +191,11 @@ class Participantes:
         #Scrollbar en el eje Y de treeDatos
         self.scrollbar=ttk.Scrollbar(self.win, orient='vertical', command=self.treeDatos.yview)
         self.treeDatos.configure(yscroll=self.scrollbar.set)
-        self.scrollbar.place(x=1000, y=50, height=400)
+        self.scrollbar.place(x=1000, y=30, height=410)
 
         #Carga los datos en treeDatos
         self.lee_tablaTreeView()    
-        self.treeDatos.place(anchor="nw", height="400", rely="0.1", width="700", x="300", y="0")
+        self.treeDatos.place(anchor="nw", height="400", rely="0.1", width="700", x="295", y="-15")
  
     def valida(self):
         '''Valida que el Id no esté vacio, devuelve True si ok'''
