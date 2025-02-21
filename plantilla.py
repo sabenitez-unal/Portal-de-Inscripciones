@@ -229,14 +229,14 @@ class Participantes:
         # Inserta los guiones en la fecha de forma automatica
         if not borrando:
             if len(self.entryFecha.get()) == 2:
-                self.entryFecha.insert(2, '-')
+                self.entryFecha.insert(2, '/')
             elif len(self.entryFecha.get()) == 5:
-                self.entryFecha.insert(5, '-')
+                self.entryFecha.insert(5, '/')
 
         # Obtener el texto del Entry
         fecha_texto = self.entryFecha.get()    
         
-        if (fecha_texto == "DD-MM-AAAA"):
+        if (fecha_texto == "DD/MM/AAAA"):
             return False  # Si no hay nada escrito, la fecha es inválida
         
         #verifica que la fecha no sea mayor a 11 caracteres
@@ -246,7 +246,7 @@ class Participantes:
         
         try:
         # Intentar convertir el texto a un objeto datetime
-            dt.strptime(fecha_texto, "%d-%m-%Y")  # Formato esperado: DD-MM-YYYY
+            dt.strptime(fecha_texto, "%d/%m/%Y")  # Formato esperado: DD/MM/YYYY
             return True 
         except ValueError:
             return False  # Si hay error, la fecha es inválida    
@@ -255,20 +255,20 @@ class Participantes:
     def resetform_fecha (self, event=None):
         self.entryFecha.delete(0,'end')
         self.entryFecha.configure(foreground="gray55")
-        self.entryFecha.insert(0, "DD-MM-AAAA")
+        self.entryFecha.insert(0, "DD/MM/AAAA")
         self.entryFecha.bind("<FocusIn>",self.borrar_fecha)
         self.entryFecha.bind("<FocusOut>",self.reescribir_fecha)
 
     #borra el text de form de fecha cuando el usuario empieza a digitar
     def borrar_fecha(self, event):
-        if self.entryFecha.get() == "DD-MM-AAAA":
+        if self.entryFecha.get() == "DD/MM/AAAA":
             self.entryFecha.configure(foreground="#000000")
             self.entryFecha.delete(0,tk.END)
 
     #reescribe el form de fecha si el usuario deja el campo vacio
     def reescribir_fecha(self,event):
         if len(self.entryFecha.get())== 0:
-            self.entryFecha.insert(0,"DD-MM-AAAA")
+            self.entryFecha.insert(0,"DD/MM/AAAA")
             self.entryFecha.configure(foreground="gray55")
         
     def valida_Celular(self, event=None):
@@ -300,17 +300,28 @@ class Participantes:
 
     def carga_ciudad_dpto(self):
         '''Carga los datos en los campos de ciudad y departamento'''
-        
-        # Cargando los datos de la DB para el departamento según la ciudad dada
-        query = 'SELECT Nombre_Departamento FROM t_ciudades WHERE Nombre_Ciudad = ?'
-        parametro = (self.treeDatos.item(self.treeDatos.selection())['values'][1],)
-        db_rows = self.run_Query(query, parametro)
-        for row in db_rows:
-            self.entryDpto.set(row[0])
 
-        # Cargando la ciudad
-        self.entryCiudad['state'] = 'readonly'
-        self.entryCiudad.set(self.treeDatos.item(self.treeDatos.selection())['values'][1])
+        # Obteniendo el id de la ciudad del registro
+        query = 'SELECT Id_Ciudad FROM t_participantes WHERE Id = ?'
+        parametro = (self.treeDatos.item(self.treeDatos.selection())['text'],)
+        db_rows = self.run_Query(query, parametro)
+        id_ciudad = [row[0] for row in db_rows][0]
+        
+        # Si hay un id de ciudad, se cargan los datos
+        if id_ciudad != None:
+            # Cargando los datos de la DB para el departamento según el id de la ciudad
+            query = 'SELECT Nombre_Departamento FROM t_ciudades WHERE Id_Ciudad = ?'
+            parametro = (id_ciudad,)
+            db_rows = self.run_Query(query, parametro)
+            for row in db_rows:
+                self.entryDpto.set(row[0])
+
+            # Cargando la ciudad
+            query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
+            db_rows = self.run_Query(query, parametro)
+            for row in db_rows:
+                self.entryCiudad['state'] = 'readonly'
+                self.entryCiudad.set(row[0])
               
     def limpia_Campos(self):
         '''Limpia los campos de entrada de los datos'''
@@ -356,16 +367,18 @@ class Participantes:
     def lee_listaCiudades(self, event=None):
         '''Carga los datos de la BD dentro de las opciones de la lista de ciudades dependiendo del departamento seleccionado'''
         
-        # Seleccionando los datos de la DB si ya se ha seleccionado el departamento
-        parametro = (self.entryDpto.get(),)
-        self.entryCiudad.set("")
+        # Si el departamento no está vacío, se cargan las ciudades
+        if self.entryDpto.get() != "":
+            # Seleccionando los datos de la DB si ya se ha seleccionado el departamento
+            parametro = (self.entryDpto.get(),)
+            self.entryCiudad.set("")
 
-        self.entryCiudad.configure(state='readonly')
-        query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ? ORDER BY Nombre_Ciudad'
-        
-        db_rows = self.run_Query(query, parametro)
-        self.ciudades = [row[0] for row in db_rows]
-        self.entryCiudad['values'] = self.ciudades
+            self.entryCiudad.configure(state='readonly')
+            query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ? ORDER BY Nombre_Ciudad'
+            
+            db_rows = self.run_Query(query, parametro)
+            self.ciudades = [row[0] for row in db_rows]
+            self.entryCiudad['values'] = self.ciudades
 
     def lee_tablaTreeView(self):
         ''' Carga los datos de la BD y Limpia la Tabla tablaTreeView '''
@@ -381,7 +394,18 @@ class Participantes:
 
         # Insertando los datos de la BD en la tabla de la pantalla
         for row in db_rows:
-            self.treeDatos.insert('',0, text = row[0], values = [row[1],row[2],row[3],row[4],row[5],row[6]])
+            # Se carga la ciudad correspondiente al id de la ciudad.
+            if row[6] != None:
+                # Se carga la ciudad correspondiente al id de la ciudad.
+                query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
+                parametro = (row[6],)
+                ciudad = self.run_Query(query, parametro)
+                ciudad = [cd[0] for cd in ciudad][0]
+            # Si id_ciudad es None, se deja vacío
+            else: ciudad = ''
+
+            # Se insertan los datos en la tabla
+            self.treeDatos.insert('',0, text = row[0], values = [row[1],ciudad,row[2],row[3],row[4],row[5]])
 
     def leer_idCiudad(self):
         '''Lee el Id de la ciudad seleccionada'''
@@ -390,11 +414,7 @@ class Participantes:
         query = 'SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ?'
         parametro = (self.entryCiudad.get(),)
         db_rows = self.run_Query(query, parametro)
-        
-        # Si no hay ciudad seleccionada, se retorna 0
-        if self.entryCiudad.get() == "":
-            return 0
-        
+  
         # Retorna el id de la ciudad y lo retorna para guardarlo o actualizarlo en la tabla t_participantes
         for row in db_rows:
             return row[0]
@@ -408,9 +428,10 @@ class Participantes:
             self.entryId.configure(state = 'readonly')
 
             # Se actualiza el registro
-            query = 'UPDATE t_participantes SET Id = ?,Nombre = ?,Ciudad = ?,Direccion = ?,Celular = ?, Entidad = ?, Fecha = ?, Id_Ciudad = ? WHERE Id = ?'
-            parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
-                        self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.leer_idCiudad(), self.entryId.get())
+            query = 'UPDATE t_participantes SET Id = ?, Nombre = ?, Direccion = ?, Celular = ?, Entidad = ?, Fecha = ?, Id_Ciudad = ? WHERE Id = ?'
+            parametros = (self.entryId.get(), self.entryNombre.get(), self.entryDireccion.get(),
+                        self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), 
+                        self.leer_idCiudad(), self.entryId.get())
             self.run_Query(query, parametros)
 
             # Se muestra un mensaje de confirmación
@@ -420,16 +441,14 @@ class Participantes:
         # Adiciona un nuevo registro si la variable actualiza es False
         else:
             # Query para insertar un nuevo registro, con id_ciudad vacío para guardarlo despúes.
-            query = 'INSERT INTO t_participantes VALUES(?, ?, ?, ?, ?, ?, ?, ?)'
-            parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
+            query = 'INSERT INTO t_participantes VALUES(?, ?, ?, ?, ?, ?, ?)'
+            parametros = (self.entryId.get(), self.entryNombre.get(), self.entryDireccion.get(),
                           self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.leer_idCiudad())
             # Valida que el Id no esté vacío y la fecha sea valida
             if self.valida() and self.valida_Fecha():
                 # Intenta insertar el registro
                 try:
                     self.run_Query(query, parametros)
-                    # Actualiza el id de la ciudad ya teniendo el registro en la tabla t_participantes.
-                    self.leer_idCiudad()
                     mssg.showinfo('',f'Registro: {self.entryId.get()} ... agregado')
                     self.limpia_Campos()
                 # Si el Id ya existe, muestra un mensaje de error
@@ -459,6 +478,7 @@ class Participantes:
 
             self.actualiza = True # Esta variable controla la actualización
             self.carga_Datos()
+            self.lee_listaCiudades()
         # Si no se selecciona un registro, muestra un mensaje de error
         else:
             self.actualiza = None
