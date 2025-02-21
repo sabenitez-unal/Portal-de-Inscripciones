@@ -231,38 +231,39 @@ class Participantes:
 
         # Obtener el texto del Entry
         fecha_texto = self.entryFecha.get()    
-        
         if (fecha_texto == "DD/MM/AAAA"):
             return False  # Si no hay nada escrito, la fecha es inválida
         
-        #verifica que la fecha no sea mayor a 11 caracteres
-        if len(fecha_texto) > 10:
+        #verifica que la fecha no sea mayor a 10 caracteres
+        if len(fecha_texto) > 9 and not borrando:
             mssg.showerror("¡Error!", "Inserte una fecha válida, por favor.")
-            self.entryFecha.delete(0, tk.END)  
+            self.entryFecha.delete(9, tk.END)  
         
-        try:
-        # Intentar convertir el texto a un objeto datetime
+        try: # Intentar convertir el texto a un objeto datetime
             dt.strptime(fecha_texto, "%d/%m/%Y")  # Formato esperado: DD/MM/YYYY
             return True 
         except ValueError:
             return False  # Si hay error, la fecha es inválida    
 
-    #reestablece el formato del entryfecha cada vez que sea necesario
     def resetform_fecha (self, event=None):
+        '''Reestablece el formato del entryfecha cada vez que sea necesario'''
+
         self.entryFecha.delete(0,'end')
         self.entryFecha.configure(foreground="gray55")
         self.entryFecha.insert(0, "DD/MM/AAAA")
         self.entryFecha.bind("<FocusIn>",self.borrar_fecha)
         self.entryFecha.bind("<FocusOut>",self.reescribir_fecha)
 
-    #borra el text de form de fecha cuando el usuario empieza a digitar
     def borrar_fecha(self, event):
+        '''Borra el texto del formato de fecha si el usuario hace click en el campo'''
+
         if self.entryFecha.get() == "DD/MM/AAAA":
             self.entryFecha.configure(foreground="#000000")
             self.entryFecha.delete(0,tk.END)
 
-    #reescribe el form de fecha si el usuario deja el campo vacio
     def reescribir_fecha(self,event):
+        '''Reescribe el texto del formato de fecha si el usuario no ha escrito nada'''
+
         if len(self.entryFecha.get())== 0:
             self.entryFecha.insert(0,"DD/MM/AAAA")
             self.entryFecha.configure(foreground="gray55")
@@ -270,12 +271,12 @@ class Participantes:
     def valida_Celular(self, event=None):
         '''Valida que el celular no tenga más de 10 dígitos y que sean números'''
 
-        try:
+        try: # Intenta convertir el texto a un número.
             int(self.entryCelular.get())
             if len(self.entryCelular.get()) >= 10:
                 mssg.showerror('¡Atención!', 'Máximo 10 dígitos')
                 self.entryCelular.delete(10, 'end')  
-        except:
+        except: # Si no es un número, lo borra.
             self.entryCelular.delete(len(self.entryCelular.get())-1, 'end')
 
     def carga_Datos(self):
@@ -309,22 +310,19 @@ class Participantes:
             query = 'SELECT Nombre_Departamento FROM t_ciudades WHERE Id_Ciudad = ?'
             parametro = (id_ciudad,)
             db_rows = self.run_Query(query, parametro)
-            for row in db_rows:
-                self.entryDpto.set(row[0])
-
+            for row in db_rows: self.entryDpto.set(row[0])
             # Cargando la ciudad
-            query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
-            db_rows = self.run_Query(query, parametro)
-            for row in db_rows:
-                self.entryCiudad['state'] = 'readonly'
-                self.entryCiudad.set(row[0])
+            ciudad = self.leer_nombreCiudad(id_ciudad)
+            self.entryCiudad['state'] = 'readonly'
+            self.entryCiudad.set(ciudad)
               
     def limpia_Campos(self):
         '''Limpia los campos de entrada de los datos'''
+
         self.entryId.configure(state='normal')
         self.entryId.delete(0, 'end')
         self.entryNombre.delete(0, 'end')
-
+        # Vacía la combobox de departamentos y ciudades
         self.entryDpto.set("")
         self.entryCiudad.set("")
         self.entryCiudad["state"] = "disabled" 
@@ -332,11 +330,9 @@ class Participantes:
         self.entryDireccion.delete(0, 'end')
         self.entryEntidad.delete(0, 'end')
         self.entryCelular.delete(0, 'end')
-
-        # limina el texto del campo fecha y reestablece su formato
+        # Elimina el texto del campo fecha y reestablece su formato
         self.entryFecha.delete(0, 'end')
         self.resetform_fecha()
-
         # Reiniciar la variable para evitar confusión en grabado
         self.actualiza = None
         
@@ -356,8 +352,7 @@ class Participantes:
         db_rows = self.run_Query(query)
         self.dptos = ['']
         for row in db_rows:
-            if row[0] != self.dptos[-1]:
-                self.dptos.append(row[0])
+            if row[0] != self.dptos[-1]: self.dptos.append(row[0])
         self.dptos.remove('')
     
     def lee_listaCiudades(self, event=None):
@@ -366,12 +361,9 @@ class Participantes:
         # Si el departamento no está vacío, se cargan las ciudades
         if self.entryDpto.get() != "":
             # Seleccionando los datos de la DB si ya se ha seleccionado el departamento
-            parametro = (self.entryDpto.get(),)
-            self.entryCiudad.set("")
-
             self.entryCiudad.configure(state='readonly')
             query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ? ORDER BY Nombre_Ciudad'
-            
+            parametro = (self.entryDpto.get(),)
             db_rows = self.run_Query(query, parametro)
             self.ciudades = [row[0] for row in db_rows]
             self.entryCiudad['values'] = self.ciudades
@@ -391,15 +383,9 @@ class Participantes:
         # Insertando los datos de la BD en la tabla de la pantalla
         for row in db_rows:
             # Se carga la ciudad correspondiente al id de la ciudad.
-            if row[6] != None:
-                # Se carga la ciudad correspondiente al id de la ciudad.
-                query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
-                parametro = (row[6],)
-                ciudad = self.run_Query(query, parametro)
-                ciudad = [cd[0] for cd in ciudad][0]
+            if row[6] != None: ciudad = self.leer_nombreCiudad(row[6])
             # Si id_ciudad es None, se deja vacío
             else: ciudad = ''
-
             # Se insertan los datos en la tabla
             self.treeDatos.insert('',0, text = row[0], values = [row[1],ciudad,row[2],row[3],row[4],row[5]])
 
@@ -414,6 +400,16 @@ class Participantes:
         # Retorna el id de la ciudad y lo retorna para guardarlo o actualizarlo en la tabla t_participantes
         for row in db_rows:
             return row[0]
+
+    def leer_nombreCiudad(self, id_ciudad):
+        '''Lee el nombre de la ciudad seleccionada según el id de la ciudad'''
+        
+        # Busca en la db el nombre de la ciudad seleccionada
+        query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
+        parametro = (id_ciudad,)
+        db_rows = self.run_Query(query, parametro)
+        ciudad = [row[0] for row in db_rows][0]
+        return ciudad
         
     def adiciona_Registro(self, event=None):
         '''Adiciona un producto a la BD si la validación es True'''
@@ -471,10 +467,9 @@ class Participantes:
             self.limpia_Campos()
             self.entryFecha.delete(0, 'end')
             self.entryFecha.configure(foreground="#000000") 
-
             self.actualiza = True # Esta variable controla la actualización
-            self.lee_listaCiudades()
             self.carga_Datos()
+            self.lee_listaCiudades()
         # Si no se selecciona un registro, muestra un mensaje de error
         else:
             self.actualiza = None
