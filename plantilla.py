@@ -366,11 +366,9 @@ class Participantes:
         # Si el departamento no está vacío, se cargan las ciudades
         if self.entryDpto.get() != "":
             # Seleccionando los datos de la DB si ya se ha seleccionado el departamento
-            parametro = (self.entryDpto.get(),)
-            self.entryCiudad.set("")
-
             self.entryCiudad.configure(state='readonly')
             query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ? ORDER BY Nombre_Ciudad'
+            parametro = (self.entryDpto.get(),)
             
             db_rows = self.run_Query(query, parametro)
             self.ciudades = [row[0] for row in db_rows]
@@ -473,8 +471,8 @@ class Participantes:
             self.entryFecha.configure(foreground="#000000") 
 
             self.actualiza = True # Esta variable controla la actualización
-            self.lee_listaCiudades()
             self.carga_Datos()
+            self.lee_listaCiudades()
         # Si no se selecciona un registro, muestra un mensaje de error
         else:
             self.actualiza = None
