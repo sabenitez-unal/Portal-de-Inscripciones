@@ -167,7 +167,7 @@ class Participantes:
 
         #Botón Cerrar Ventana
         self.btnCerrarV = ttk.Button(self.win)
-        self.btnCerrarV.configure(text="Finalizar Inscripción", width="18",command=self.limpia_Campos, style="TButton")
+        self.btnCerrarV.configure(text="Finalizar Inscripción", width="18",command = self.cerrar_ventana, style="TButton")
         self.btnCerrarV.place(anchor="nw", rely="0.75", x="895", y="75")
 
         #tablaTreeView
@@ -202,11 +202,11 @@ class Participantes:
         #Scrollbar en el eje Y de treeDatos
         self.scrollbar=ttk.Scrollbar(self.win, orient='vertical', command=self.treeDatos.yview)
         self.treeDatos.configure(yscroll=self.scrollbar.set)
-        self.scrollbar.place(x=1000, y=30, height=410)
+        self.scrollbar.place(x=1000, y=34, height=398)
 
         #Carga los datos en treeDatos
         self.lee_tablaTreeView()    
-        self.treeDatos.place(anchor="nw", height="400", rely="0.1", width="700", x="300", y="0")
+        self.treeDatos.place(anchor="nw", height="400", rely="0.1", width="700", x="295", y="-15")
 
     def centrar_ventana(self): #centra la ventana en el centro de la pantalla
             """ Centra la ventana en la pantalla """
@@ -220,7 +220,10 @@ class Participantes:
             posicion_y = (screen_height - window_height) // 2
 
             self.win.geometry(f"{window_width}x{window_height}+{posicion_x}+{posicion_y}")
- 
+
+    def cerrar_ventana (self):
+        self.win.destroy()
+        
     def valida(self):
         '''Valida que el Id no esté vacio, devuelve True si ok'''
         return(len(self.entryId.get()) != 0)
