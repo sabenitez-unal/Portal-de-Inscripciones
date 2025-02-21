@@ -414,9 +414,10 @@ class Participantes:
             self.entryId.configure(state = 'readonly')
 
             # Se actualiza el registro
-            query = 'UPDATE t_participantes SET Id = ?,Nombre = ?,Ciudad = ?,Direccion = ?,Celular = ?, Entidad = ?, Fecha = ?, Id_Ciudad = ? WHERE Id = ?'
-            parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
-                        self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.leer_idCiudad(), self.entryId.get())
+            query = 'UPDATE t_participantes SET Id = ?, Nombre = ?, Direccion = ?, Celular = ?, Entidad = ?, Fecha = ?, Id_Ciudad = ? WHERE Id = ?'
+            parametros = (self.entryId.get(), self.entryNombre.get(), self.entryDireccion.get(),
+                        self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), 
+                        self.leer_idCiudad(), self.entryId.get())
             self.run_Query(query, parametros)
 
             # Se muestra un mensaje de confirmación
@@ -426,8 +427,8 @@ class Participantes:
         # Adiciona un nuevo registro si la variable actualiza es False
         else:
             # Query para insertar un nuevo registro, con id_ciudad vacío para guardarlo despúes.
-            query = 'INSERT INTO t_participantes VALUES(?, ?, ?, ?, ?, ?, ?, ?)'
-            parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
+            query = 'INSERT INTO t_participantes VALUES(?, ?, ?, ?, ?, ?, ?)'
+            parametros = (self.entryId.get(), self.entryNombre.get(), self.entryDireccion.get(),
                           self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.leer_idCiudad())
             # Valida que el Id no esté vacío y la fecha sea valida
             if self.valida() and self.valida_Fecha():
