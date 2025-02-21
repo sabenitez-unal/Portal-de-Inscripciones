@@ -477,8 +477,8 @@ class Participantes:
             self.entryFecha.configure(foreground="#000000") 
 
             self.actualiza = True # Esta variable controla la actualización
-            self.carga_Datos()
             self.lee_listaCiudades()
+            self.carga_Datos()
         # Si no se selecciona un registro, muestra un mensaje de error
         else:
             self.actualiza = None
