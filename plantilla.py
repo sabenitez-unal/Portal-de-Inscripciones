@@ -123,8 +123,10 @@ class Participantes:
         self.entryFecha = tk.Entry(self.lblfrm_Datos,foreground="gray55")
         self.entryFecha.configure(exportselection="true", justify="left",relief="groove", width="30")
         self.entryFecha.grid(column="1", row="7", sticky="w")
-        self.entryFecha.bind("<BackSpace>", lambda event: self.valida_Fecha(True)) #valida fecha al borrar con backSpace
-        self.entryFecha.bind("<Key>", lambda event: self.valida_Fecha(False)) #valida fecha al tocar cualquier tecla
+        # Valida fecha al borrar con backSpace
+        self.entryFecha.bind("<BackSpace>", lambda event: self.valida_Fecha(True))
+        # Valida fecha al escribir
+        self.entryFecha.bind("<Key>", lambda event: self.valida_Fecha(False))
         
         #Coloca un texto traslucido para guiar al usuario con el form de fecha       
         self.resetform_fecha()
@@ -250,7 +252,7 @@ class Participantes:
             return False  # Si hay error, la fecha es inválida    
 
     #reestablece el formato del entryfecha cada vez que sea necesario
-    def resetform_fecha (self,event = None):
+    def resetform_fecha (self, event=None):
         self.entryFecha.delete(0,'end')
         self.entryFecha.configure(foreground="gray55")
         self.entryFecha.insert(0, "DD-MM-AAAA")
@@ -258,7 +260,7 @@ class Participantes:
         self.entryFecha.bind("<FocusOut>",self.reescribir_fecha)
 
     #borra el text de form de fecha cuando el usuario empieza a digitar
-    def borrar_fecha(self,event):
+    def borrar_fecha(self, event):
         if self.entryFecha.get() == "DD-MM-AAAA":
             self.entryFecha.configure(foreground="#000000")
             self.entryFecha.delete(0,tk.END)
@@ -380,6 +382,22 @@ class Participantes:
         # Insertando los datos de la BD en la tabla de la pantalla
         for row in db_rows:
             self.treeDatos.insert('',0, text = row[0], values = [row[1],row[2],row[3],row[4],row[5],row[6]])
+
+    def leer_idCiudad(self):
+        '''Lee el Id de la ciudad seleccionada'''
+        
+        # Busca en la db el id de la ciudad seleccionada
+        query = 'SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ?'
+        parametro = (self.entryCiudad.get(),)
+        db_rows = self.run_Query(query, parametro)
+        
+        # Si no hay ciudad seleccionada, se retorna 0
+        if self.entryCiudad.get() == "":
+            return 0
+        
+        # Retorna el id de la ciudad y lo retorna para guardarlo o actualizarlo en la tabla t_participantes
+        for row in db_rows:
+            return row[0]
         
     def adiciona_Registro(self, event=None):
         '''Adiciona un producto a la BD si la validación es True'''
@@ -388,29 +406,39 @@ class Participantes:
         if self.actualiza and self.valida_Fecha():
             self.actualiza = None
             self.entryId.configure(state = 'readonly')
-            query = 'UPDATE t_participantes SET Id = ?,Nombre = ?,Ciudad = ?,Direccion = ?,Celular = ?, Entidad = ?, Fecha = ? WHERE Id = ?'
+
+            # Se actualiza el registro
+            query = 'UPDATE t_participantes SET Id = ?,Nombre = ?,Ciudad = ?,Direccion = ?,Celular = ?, Entidad = ?, Fecha = ?, Id_Ciudad = ? WHERE Id = ?'
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
-                        self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.entryId.get())
+                        self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.leer_idCiudad(), self.entryId.get())
             self.run_Query(query, parametros)
+
+            # Se muestra un mensaje de confirmación
             mssg.showinfo('Ok',' Registro actualizado con éxito')
             self.limpia_Campos()
             
         # Adiciona un nuevo registro si la variable actualiza es False
         else:
-            query = 'INSERT INTO t_participantes VALUES(?, ?, ?, ?, ?, ?, ?)'
+            # Query para insertar un nuevo registro, con id_ciudad vacío para guardarlo despúes.
+            query = 'INSERT INTO t_participantes VALUES(?, ?, ?, ?, ?, ?, ?, ?)'
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryCiudad.get(), self.entryDireccion.get(),
-                          self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get())
+                          self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.leer_idCiudad())
             # Valida que el Id no esté vacío y la fecha sea valida
             if self.valida() and self.valida_Fecha():
+                # Intenta insertar el registro
                 try:
                     self.run_Query(query, parametros)
+                    # Actualiza el id de la ciudad ya teniendo el registro en la tabla t_participantes.
+                    self.leer_idCiudad()
                     mssg.showinfo('',f'Registro: {self.entryId.get()} ... agregado')
                     self.limpia_Campos()
+                # Si el Id ya existe, muestra un mensaje de error
                 except:
                     mssg.showerror("¡Error!", "No puede guardar más de un registro con el mismo Id")
+            # Si el Id está vacío, se muestra un mensaje de error
             elif not self.valida():
                 mssg.showerror("¡ Atención !","No puede dejar la identificación vacía")
-
+            # Si la fecha no es válida, se muestra un mensaje de error
             elif not self.valida_Fecha():
                 mssg.showerror("¡ Atención !","Debe completar el campo de fecha con una fecha valida en formato DD-MM-AAAA")
                 self.resetform_fecha()
@@ -431,10 +459,10 @@ class Participantes:
 
             self.actualiza = True # Esta variable controla la actualización
             self.carga_Datos()
+        # Si no se selecciona un registro, muestra un mensaje de error
         else:
             self.actualiza = None
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
-        
         
     def elimina_Registro(self, event=None):
         '''Elimina un registro seleccionado de la base de datos'''
@@ -447,6 +475,7 @@ class Participantes:
                 self.run_Query(query, parametro)
                 self.limpia_Campos()
             mssg.showinfo("", "¡El registro ha sido eliminado con éxito!")
+        # Si no se selecciona un registro, muestra un mensaje de error
         else:
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
 
