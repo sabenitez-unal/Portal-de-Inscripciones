@@ -235,10 +235,10 @@ class Participantes:
         if (fecha_texto == "DD/MM/AAAA"):
             return False  # Si no hay nada escrito, la fecha es inválida
         
-        #verifica que la fecha no sea mayor a 11 caracteres
-        if len(fecha_texto) > 10:
+        #verifica que la fecha no sea mayor a 10 caracteres
+        if len(fecha_texto) > 9 and not borrando:
             mssg.showerror("¡Error!", "Inserte una fecha válida, por favor.")
-            self.entryFecha.delete(0, tk.END)  
+            self.entryFecha.delete(9, tk.END)  
         
         try:
         # Intentar convertir el texto a un objeto datetime
