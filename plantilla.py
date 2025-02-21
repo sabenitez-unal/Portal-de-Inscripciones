@@ -390,11 +390,7 @@ class Participantes:
         query = 'SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ?'
         parametro = (self.entryCiudad.get(),)
         db_rows = self.run_Query(query, parametro)
-        
-        # Si no hay ciudad seleccionada, se retorna 0
-        if self.entryCiudad.get() == "":
-            return 0
-        
+  
         # Retorna el id de la ciudad y lo retorna para guardarlo o actualizarlo en la tabla t_participantes
         for row in db_rows:
             return row[0]
