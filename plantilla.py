@@ -300,17 +300,26 @@ class Participantes:
 
     def carga_ciudad_dpto(self):
         '''Carga los datos en los campos de ciudad y departamento'''
+
+        # Obteniendo el id de la ciudad del registro
+        query = 'SELECT Id_Ciudad FROM t_participantes WHERE Id = ?'
+        parametro = (self.treeDatos.item(self.treeDatos.selection())['text'],)
+        db_rows = self.run_Query(query, parametro)
+        id_ciudad = [row[0] for row in db_rows][0]
         
-        # Cargando los datos de la DB para el departamento según la ciudad dada
-        query = 'SELECT Nombre_Departamento FROM t_ciudades WHERE Nombre_Ciudad = ?'
-        parametro = (self.treeDatos.item(self.treeDatos.selection())['values'][1],)
+        # Cargando los datos de la DB para el departamento según el id de la ciudad
+        query = 'SELECT Nombre_Departamento FROM t_ciudades WHERE Id_Ciudad = ?'
+        parametro = (id_ciudad,)
         db_rows = self.run_Query(query, parametro)
         for row in db_rows:
             self.entryDpto.set(row[0])
 
         # Cargando la ciudad
         self.entryCiudad['state'] = 'readonly'
-        self.entryCiudad.set(self.treeDatos.item(self.treeDatos.selection())['values'][1])
+        query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?'
+        db_rows = self.run_Query(query, parametro)
+        for row in db_rows:
+            self.entryCiudad.set(row[0])
               
     def limpia_Campos(self):
         '''Limpia los campos de entrada de los datos'''
