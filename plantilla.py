@@ -10,7 +10,7 @@ from datetime import datetime as dt
 class Participantes:
     # nombre de la base de datos  y ruta 
     path = str(Path.Path(__file__).parent)
-    db_name = path + r'/Participantes.db'
+    db_name = path + r'\Participantes.db'
     actualiza = None
     def __init__(self, master=None):
 
@@ -21,7 +21,7 @@ class Participantes:
         self.win.configure(background="Cadetblue3", height="480", relief="flat", width="1024")
         self.win.geometry("1024x480")
         self.centrar_ventana()
-        self.path = self.path +r'/cubo.ico'
+        self.path = self.path +r'\cubo.ico'
         self.win.iconbitmap(self.path)
         self.win.resizable(False, False)
         self.win.title("Portal de Inscripciones")
@@ -242,12 +242,12 @@ class Participantes:
     def valida_Fecha(self, event=None):
         '''Valida que la fecha insertada sea válida y le da formato DD-MM-AAAA'''
 
+        # Si no hay nada escrito, la fecha es inválida
+        if (self.entryFecha.get() == "DD/MM/AAAA"): return False
         # Obtener el texto del Entry
         fecha_texto = self.entryFecha.get()
         # Se crea una variable para almacenar la fecha con el formato de barras
         fecha_formato = ''
-        # Si no hay nada escrito, la fecha es inválida
-        if (self.entryFecha.get() == "DD/MM/AAAA"): return False
 
         # Inserta los guiones en la fecha de forma automatica
         if event.keysym != 'BackSpace' and event.keysym != 'Delete':
