@@ -18,7 +18,7 @@ class Participantes:
         self.win = tk.Tk() if master is None else tk.Toplevel()      
              
         #Top Level - Configuración
-        self.win.configure(background="Cadetblue3", height="480", relief="flat", width="1024")
+        self.win.configure(background="#c5e1a5", height="480", relief="flat", width="1024")
         self.win.geometry("1024x480")
         self.centrar_ventana()
         self.path = self.path +r'\cubo.ico'
@@ -26,16 +26,39 @@ class Participantes:
         self.win.resizable(False, False)
         self.win.title("Portal de Inscripciones")
         self.win.pack_propagate(0) 
+
+        # Configuración del estilo de los widgets
+        self.style = ttk.Style()
+        self.style.theme_use("clam")
+        self.style.configure("TLabel", font=("Helvetica", 14), background="#dcedc8", foreground="black")
+        self.style.configure("TButton", font=("Helvetica", 12), background="#dcedc8", foreground="black", borderwidth=0, relief="flat")
+        self.style.map("TButton", background=[("active", "#f0f4c3")], foreground=[("active", "#33691e")])
+        self.style.configure("Treeview", font=("Helvetica", 11), rowheight=25, background="#e9f7ef", foreground="black", relief="flat")
+        self.style.configure("Treeview.Heading", font=("Helvetica", 12, "bold"), background="#dcedc8", foreground="black", borderwidth=0, relief="flat")
+        self.style.layout("Treeview", [('Treeview.Heading', {'sticky': 'nswe'})])
+        self.style.configure("TFrame", background="#dcedc8", relief="solid", borderwidth=1, 
+                            bordercolor="#aed581", textbackground="#dcedc8", textforeground="#33691e")
+        
+        # Configuración del estilo para los combobox
+        self.style.configure("TCombobox", fieldbackground="white", background="white", foreground="black")
+        self.style.map("TCombobox", fieldbackground=[("readonly", "white")], selectbackground=[("readonly", "white")], 
+                       selectforeground=[("readonly", "black")])
+        self.style.map("TCombobox", selectbackground=[("active", "#f0f4c3")], selectforeground=[("active", "#33691e")])
+        self.style.map("TCombobox", fieldbackground=[("disabled", "#c5e1a5")])
         
         # Main widget
         self.mainwindow = self.win
         
         #Label Frame
-        self.lblfrm_Datos = tk.LabelFrame(self.win, width= 600, height= 200, labelanchor= "n",
-                                          font= ("Helvetica", 13,"bold"))
+        self.lblfrm_Datos = ttk.LabelFrame(self.win, width= 600, height= 200, labelanchor= "n", style="TFrame")
+        #Configuración del Label Frame    
+        self.lblfrm_Datos.configure(height="410", relief="groove", text=" Inscripción ", width="330")
+        self.lblfrm_Datos.place(anchor="nw", relx="0.01", rely="0.05", width="280", x="0", y="0")
+        self.lblfrm_Datos.grid_propagate(0)
+
         #Label Id
         self.lblId = ttk.Label(self.lblfrm_Datos)
-        self.lblId.configure(anchor="e", font="TkTextFont", justify="left", text="Idenficación")
+        self.lblId.configure(anchor="e", font="TkTextFont", justify="left", text="Idenficación", style="TLabel")
         self.lblId.configure(width="12")
         self.lblId.grid(column="0", padx="5", pady="15", row="0", sticky="w")
         
@@ -47,7 +70,7 @@ class Participantes:
         
         #Label Nombre
         self.lblNombre = ttk.Label(self.lblfrm_Datos)
-        self.lblNombre.configure(anchor="e", font="TkTextFont", justify="left", text="Nombre")
+        self.lblNombre.configure(anchor="e", font="TkTextFont", justify="left", text="Nombre", style="TLabel")
         self.lblNombre.configure(width="12")
         self.lblNombre.grid(column="0", padx="5", pady="15", row="1", sticky="w")
         
@@ -58,31 +81,31 @@ class Participantes:
 
         #Label Departamento
         self.lblDpto = ttk.Label(self.lblfrm_Datos)
-        self.lblDpto.configure(anchor="e", font="TkTextFont", justify="left", text="Departamento")
+        self.lblDpto.configure(anchor="e", font="TkTextFont", justify="left", text="Departamento", style="TLabel")
         self.lblDpto.configure(width="13")
         self.lblDpto.grid(column="0", padx="3", pady="15", row="2", sticky="w")
 
         #Entry Departamento
         self.lee_Dptos()
         self.entryDpto = ttk.Combobox(self.lblfrm_Datos, values=self.dptos)
-        self.entryDpto.configure(exportselection="true", justify="left", width="27", state='readonly')
+        self.entryDpto.configure(exportselection="true", justify="left", width="27", state='readonly', style="TCombobox")
         self.entryDpto.grid(column="1", row="2", sticky="w")
         self.entryDpto.bind('<<ComboboxSelected>>', self.dpto_Seleccionado)
 
         #Label Ciudad
         self.lblCiudad = ttk.Label(self.lblfrm_Datos)
-        self.lblCiudad.configure(anchor="e", font="TkTextFont", justify="left", text="Ciudad")
+        self.lblCiudad.configure(anchor="e", font="TkTextFont", justify="left", text="Ciudad", style="TLabel")
         self.lblCiudad.configure(width="12")
         self.lblCiudad.grid(column="0", padx="5", pady="15", row="3", sticky="w")
 
         #Entry Ciudad
         self.entryCiudad = ttk.Combobox(self.lblfrm_Datos, values=[])
-        self.entryCiudad.configure(exportselection="true", justify="left", width="27", state='disabled')
+        self.entryCiudad.configure(exportselection="true", justify="left", width="27", state='disabled', style="TCombobox")
         self.entryCiudad.grid(column="1", row="3", sticky="w")
         
         #Label Direccion
         self.lblDireccion = ttk.Label(self.lblfrm_Datos)
-        self.lblDireccion.configure(anchor="e", font="TkTextFont", justify="left", text="Dirección")
+        self.lblDireccion.configure(anchor="e", font="TkTextFont", justify="left", text="Dirección", style="TLabel")
         self.lblDireccion.configure(width="12")
         self.lblDireccion.grid(column="0", padx="5", pady="15", row="4", sticky="w")
         
@@ -93,7 +116,7 @@ class Participantes:
         
         #Label Celular
         self.lblCelular = ttk.Label(self.lblfrm_Datos)
-        self.lblCelular.configure(anchor="e", font="TkTextFont", justify="left", text="Celular")
+        self.lblCelular.configure(anchor="e", font="TkTextFont", justify="left", text="Celular", style="TLabel")
         self.lblCelular.configure(width="12")
         self.lblCelular.grid(column="0", padx="5", pady="15", row="5", sticky="w")
         
@@ -105,7 +128,7 @@ class Participantes:
         
         #Label Entidad
         self.lblEntidad = ttk.Label(self.lblfrm_Datos)
-        self.lblEntidad.configure(anchor="e", font="TkTextFont", justify="left", text="Entidad")
+        self.lblEntidad.configure(anchor="e", font="TkTextFont", justify="left", text="Entidad", style="TLabel")
         self.lblEntidad.configure(width="12")
         self.lblEntidad.grid(column="0", padx="5", pady="15", row="6", sticky="w")
         
@@ -116,7 +139,7 @@ class Participantes:
         
         #Label Fecha
         self.lblFecha = ttk.Label(self.lblfrm_Datos)
-        self.lblFecha.configure(anchor="e", font="TkTextFont", justify="left", text="Fecha")
+        self.lblFecha.configure(anchor="e", font="TkTextFont", justify="left", text="Fecha", style="TLabel")
         self.lblFecha.configure(width="12")
         self.lblFecha.grid(column="0", padx="5", pady="15", row="7", sticky="w")
         
@@ -129,54 +152,37 @@ class Participantes:
         
         #Coloca un texto traslucido para guiar al usuario con el form de fecha       
         self.resetform_fecha()
-
-        #Configuración del Label Frame    
-        self.lblfrm_Datos.configure(height="410", relief="groove", text=" Inscripción ", width="330")
-        self.lblfrm_Datos.place(anchor="nw", relx="0.01", rely="0.05", width="280", x="0", y="0")
-        self.lblfrm_Datos.grid_propagate(0)
-
-        #estilo para los botones
-        self.btn_style = ttk.Style()
-        self.btn_style.configure("TButton", font=("SegoeUI", 8, "bold") , background ='#4682B4')
-        self.btn_style.map("TButton", background=[('active', 'turquoise1'), ('!pressed', '#4682B4')]) 
                       
         #Botón Grabar
-        self.btnGrabar = ttk.Button(self.win, text="Grabar", width="9", style="TButton", command=self.adiciona_Registro, takefocus=False)
+        self.btnGrabar = ttk.Button(self.win, text="Grabar", width="7", style="TButton", command=self.adiciona_Registro, takefocus=False)
         self.btnGrabar.place(anchor="nw", relx="0.01", rely="0.75", x="0", y="80")
-
         #Botón Editar
-        self.btnEditar = ttk.Button(self.win, text="Editar", width="9", style="TButton", command=self.edita_tablaTreeView, takefocus=False)
-        self.btnEditar.place(anchor="nw", rely="0.75", x="80", y="80")
-
+        self.btnEditar = ttk.Button(self.win, text="Editar", width="7", style="TButton", command=self.edita_tablaTreeView, takefocus=False)
+        self.btnEditar.place(anchor="nw", rely="0.75", x="90", y="80")
         #Botón Eliminar
-        self.btnEliminar = ttk.Button(self.win, text="Eliminar", width="9", style="TButton", command=self.elimina_Registro, takefocus=False)
-        self.btnEliminar.place(anchor="nw", rely="0.75", x="150", y="80")
-
+        self.btnEliminar = ttk.Button(self.win, text="Eliminar", width="7", style="TButton", command=self.elimina_Registro, takefocus=False)
+        self.btnEliminar.place(anchor="nw", rely="0.75", x="170", y="80")
         #Botón Cancelar
-        self.btnCancelar = ttk.Button(self.win)
-        self.btnCancelar.configure(text="Cancelar", width="9",command=lambda : [self.limpia_Campos(), self.lee_tablaTreeView()], style="TButton", takefocus=False)
-        self.btnCancelar.place(anchor="nw", rely="0.75", x="220", y="80")
-        
-        #Botón Seleccionar todos los participantes
-        self.btnCerrarV = ttk.Button(self.win, text="Select all", width="9",command=self.selec_all, style="TButton", takefocus=False)
-        self.btnCerrarV.place(anchor="nw", rely="0.75", x="290", y="80")
-
+        self.btnCancelar = ttk.Button(self.win, style="TButton", width="7", takefocus=False)
+        self.btnCancelar.configure(text="Cancelar", command = lambda:[self.limpia_Campos(), self.lee_tablaTreeView()])
+        self.btnCancelar.place(anchor="nw", rely="0.75", x="250", y="80")
         #Botón Consultar
-        self.btnConsultar = ttk.Button(self.win, text="Consultar Datos", width="18",command=self.consulta_participantes, style="TButton", takefocus=False)
-        self.btnConsultar.place(anchor="nw", rely="0.75", x="770", y="80")
-
+        self.btnConsultar = ttk.Button(self.win)
+        self.btnConsultar.configure(text="Consultar Datos", width="18",command=self.consulta_participantes, style="TButton")
+        self.btnConsultar.place(anchor="nw", rely="0.75", x="660", y="80")
         #Botón Cerrar Ventana
-        self.btnCerrarV = ttk.Button(self.win, text="Finalizar Inscripción", width="18",command=self.win.destroy, style="TButton", takefocus=False)
-        self.btnCerrarV.place(anchor="nw", rely="0.75", x="895", y="80")
+        self.btnCerrarV = ttk.Button(self.win)
+        self.btnCerrarV.configure(text="Finalizar Inscripción", width="18",command=self.win.destroy, style="TButton")
+        self.btnCerrarV.place(anchor="nw", rely="0.75", x="840", y="80")
 
         #tablaTreeView
-        self.style=ttk.Style()
+        '''self.style=ttk.Style()
         self.style.configure("estilo.Treeview", highlightthickness=0, bd=0, background='AliceBlue', font=('Calibri Light',10))
-        self.style.configure("estilo.Treeview.Heading", background='Azure', font=('Calibri Light', 10,'bold')) 
-        self.style.layout("estilo.Treeview", [('estilo.Treeview.treearea', {'sticky': 'nswe'})])
+        self.style.configure("Treeview.Heading", background='Azure', font=('Calibri Light', 10,'bold')) 
+        self.style.layout("estilo.Treeview", [('estilo.Treeview.treearea', {'sticky': 'nswe'})])'''
 
-        self.treeDatos = ttk.Treeview(self.win, height = 10, selectmode="extended", style="estilo.Treeview")
-        self.treeDatos.place(x=380, y=0, height=410, width = 500)
+        self.treeDatos = ttk.Treeview(self.win, selectmode="extended", style="Treeview")
+        self.treeDatos.place(x=380, y=0, height=480, width = 550)
 
        # Etiquetas de las columnas
         self.treeDatos["columns"]=("Nombre","Ciudad","Dirección","Celular","Entidad","Fecha")
