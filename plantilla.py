@@ -27,9 +27,18 @@ class Participantes:
         self.win.title("Portal de Inscripciones")
         self.win.pack_propagate(0) 
 
-        # Estilo de la ventana
+        # Configuración del estilo de los widgets
         style = ttk.Style()
         style.theme_use("clam")
+        style.configure("TLabel", font=("Helvetica", 14), background="#ddffec", foreground="black")
+        style.configure("TButton", font=("Helvetica", 12), background="#248bff", foreground="white", borderwidth=1, relief="solid", padding=10)
+        style.map("TButton", background=[("active", "#052774")], foreground=[("active", "white")])
+        style.configure("Treeview", font=("Helvetica", 11), rowheight=25)
+        style.configure("Treeview.Heading", font=("Helvetica", 12, "bold"))
+        style.configure("TFrame", background="#ddffec", relief="solid", borderwidth=1)
+        
+        # Configuración del estilo para los combobox
+        style.configure("TCombobox", selectbackground="#0078D7", selectforeground="white")
         
         # Main widget
         self.mainwindow = self.win
@@ -39,7 +48,7 @@ class Participantes:
                                           font= ("Helvetica", 13,"bold"))
         #Label Id
         self.lblId = ttk.Label(self.lblfrm_Datos)
-        self.lblId.configure(anchor="e", font="TkTextFont", justify="left", text="Idenficación")
+        self.lblId.configure(anchor="e", font="TkTextFont", justify="left", text="Idenficación", style="TLabel")
         self.lblId.configure(width="12")
         self.lblId.grid(column="0", padx="5", pady="15", row="0", sticky="w")
         
@@ -51,7 +60,7 @@ class Participantes:
         
         #Label Nombre
         self.lblNombre = ttk.Label(self.lblfrm_Datos)
-        self.lblNombre.configure(anchor="e", font="TkTextFont", justify="left", text="Nombre")
+        self.lblNombre.configure(anchor="e", font="TkTextFont", justify="left", text="Nombre", style="TLabel")
         self.lblNombre.configure(width="12")
         self.lblNombre.grid(column="0", padx="5", pady="15", row="1", sticky="w")
         
@@ -62,7 +71,7 @@ class Participantes:
 
         #Label Departamento
         self.lblDpto = ttk.Label(self.lblfrm_Datos)
-        self.lblDpto.configure(anchor="e", font="TkTextFont", justify="left", text="Departamento")
+        self.lblDpto.configure(anchor="e", font="TkTextFont", justify="left", text="Departamento", style="TLabel")
         self.lblDpto.configure(width="13")
         self.lblDpto.grid(column="0", padx="3", pady="15", row="2", sticky="w")
 
@@ -75,7 +84,7 @@ class Participantes:
 
         #Label Ciudad
         self.lblCiudad = ttk.Label(self.lblfrm_Datos)
-        self.lblCiudad.configure(anchor="e", font="TkTextFont", justify="left", text="Ciudad")
+        self.lblCiudad.configure(anchor="e", font="TkTextFont", justify="left", text="Ciudad", style="TLabel")
         self.lblCiudad.configure(width="12")
         self.lblCiudad.grid(column="0", padx="5", pady="15", row="3", sticky="w")
 
@@ -86,7 +95,7 @@ class Participantes:
         
         #Label Direccion
         self.lblDireccion = ttk.Label(self.lblfrm_Datos)
-        self.lblDireccion.configure(anchor="e", font="TkTextFont", justify="left", text="Dirección")
+        self.lblDireccion.configure(anchor="e", font="TkTextFont", justify="left", text="Dirección", style="TLabel")
         self.lblDireccion.configure(width="12")
         self.lblDireccion.grid(column="0", padx="5", pady="15", row="4", sticky="w")
         
@@ -97,7 +106,7 @@ class Participantes:
         
         #Label Celular
         self.lblCelular = ttk.Label(self.lblfrm_Datos)
-        self.lblCelular.configure(anchor="e", font="TkTextFont", justify="left", text="Celular")
+        self.lblCelular.configure(anchor="e", font="TkTextFont", justify="left", text="Celular", style="TLabel")
         self.lblCelular.configure(width="12")
         self.lblCelular.grid(column="0", padx="5", pady="15", row="5", sticky="w")
         
@@ -109,7 +118,7 @@ class Participantes:
         
         #Label Entidad
         self.lblEntidad = ttk.Label(self.lblfrm_Datos)
-        self.lblEntidad.configure(anchor="e", font="TkTextFont", justify="left", text="Entidad")
+        self.lblEntidad.configure(anchor="e", font="TkTextFont", justify="left", text="Entidad", style="TLabel")
         self.lblEntidad.configure(width="12")
         self.lblEntidad.grid(column="0", padx="5", pady="15", row="6", sticky="w")
         
@@ -120,7 +129,7 @@ class Participantes:
         
         #Label Fecha
         self.lblFecha = ttk.Label(self.lblfrm_Datos)
-        self.lblFecha.configure(anchor="e", font="TkTextFont", justify="left", text="Fecha")
+        self.lblFecha.configure(anchor="e", font="TkTextFont", justify="left", text="Fecha", style="TLabel")
         self.lblFecha.configure(width="12")
         self.lblFecha.grid(column="0", padx="5", pady="15", row="7", sticky="w")
         
@@ -138,11 +147,6 @@ class Participantes:
         self.lblfrm_Datos.configure(height="410", relief="groove", text=" Inscripción ", width="330")
         self.lblfrm_Datos.place(anchor="nw", relx="0.01", rely="0.05", width="280", x="0", y="0")
         self.lblfrm_Datos.grid_propagate(0)
-
-        #estilo para los botones
-        self.btn_style = ttk.Style()
-        self.btn_style.configure("TButton", font=("SegoeUI", 8, "bold") , background ='#4682B4')
-        self.btn_style.map("TButton", background=[('active', 'turquoise1'), ('!pressed', '#4682B4')]) 
                       
         #Botón Grabar
         self.btnGrabar = ttk.Button(self.win, text="Grabar", width="9", style="TButton", command=self.adiciona_Registro, takefocus=False)
