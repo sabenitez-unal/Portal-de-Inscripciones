@@ -227,40 +227,46 @@ class Participantes:
 
     def valida_Identificacion(self, event=None):
         ''' Valida que la longitud no sea mayor a 15 caracteres y únicamente sean números'''
+        # Si se presiona una tecla, se valida que sea un número y que no se exceda la longitud de 15 caracteres
         if event.char:
             try:
                 int(self.entryId.get())
                 if len(self.entryId.get()) >= 15:
                     mssg.showerror('¡Atención!','... ¡Máximo 15 caracteres! ...')
                     self.entryId.delete(15,"end")
-            except:
-                self.entryId.delete(len(self.entryId.get())-1, 'end')
-        else:
-              self.entryId.delete(15,"end")
+            # Si no es un número, borra el último caracter
+            except: self.entryId.delete(len(self.entryId.get())-1, 'end')
+        # Si se pega un texto, se valida que sea un número y que no se exceda la longitud de 15 caracteres
+        else: self.entryId.delete(15,"end")
 
     def valida_Fecha(self, event=None):
         '''Valida que la fecha insertada sea válida y le da formato DD-MM-AAAA'''
 
+        # Obtener el texto del Entry
+        fecha_texto = self.entryFecha.get()
+        # Se crea una variable para almacenar la fecha con el formato de barras
+        fecha_formato = ''
+        # Si no hay nada escrito, la fecha es inválida
+        if (self.entryFecha.get() == "DD/MM/AAAA"): return False
+
         # Inserta los guiones en la fecha de forma automatica
         if event.keysym != 'BackSpace' and event.keysym != 'Delete':
-            if len(self.entryFecha.get()) == 2:
-                self.entryFecha.insert(2, '/')
-            elif len(self.entryFecha.get()) == 5:
-                self.entryFecha.insert(5, '/')
-
-        # Obtener el texto del Entry
-        fecha_texto = self.entryFecha.get()    
-        if (fecha_texto == "DD/MM/AAAA"):
-            return False  # Si no hay nada escrito, la fecha es inválida
+            # Inserta los guiones en la fecha de forma automática
+            for i, num in enumerate(fecha_texto):
+                if i == 2 or i == 5: fecha_formato += '/'
+                # Comprueba que la tecla no sea una letra, si lo es, la ignora
+                if num.isdigit(): fecha_formato += num
+            self.entryFecha.delete(0, 'end')
+            self.entryFecha.insert(0, fecha_formato)
         
         #verifica que la fecha no sea mayor a 10 caracteres
-        if len(fecha_texto) > 10:
+        if len(fecha_formato) > 10:
             mssg.showerror("¡Error!", "Inserte una fecha válida, por favor.")
-            self.entryFecha.delete(10, tk.END)  
+            self.entryFecha.delete(10, 'end')  
         
         try: # Intentar convertir el texto a un objeto datetime
-            dt.strptime(fecha_texto, "%d/%m/%Y")  # Formato esperado: DD/MM/YYYY
-            return True 
+            dt.strptime(fecha_formato, "%d/%m/%Y")  # Formato esperado: DD/MM/YYYY
+            return True # Si no hay error, la fecha es válida
         except ValueError:
             return False  # Si hay error, la fecha es inválida    
 
@@ -295,8 +301,8 @@ class Participantes:
             if len(self.entryCelular.get()) >= 10:
                 mssg.showerror('¡Atención!', 'Máximo 10 dígitos')
                 self.entryCelular.delete(10, 'end')  
-        except: # Si no es un número, lo borra.
-            self.entryCelular.delete(len(self.entryCelular.get())-1, 'end')
+        # Si no es un número, lo borra.
+        except: self.entryCelular.delete(len(self.entryCelular.get())-1, 'end')
 
     def carga_Datos(self):
         ''' Carga los datos en los campos desde el treeView'''
