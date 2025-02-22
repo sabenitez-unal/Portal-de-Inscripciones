@@ -518,10 +518,11 @@ class Participantes:
         self.lee_tablaTreeView()
     
     def consulta_participantes(self):
-        """ Filtra el Treeview según el ID, Nombre, Ciudad, Departamento o Fecha ingresados """
+        '''Filtra el Treeview según el ID, Nombre, Ciudad, Departamento o Fecha ingresados'''
     
-        id_partic = self.entryId.get().strip()               # obtiene info del campo solicitado
-        ciudad_nombre = self.entryCiudad.get().strip()       # con .strip() elimina espacios en blanco inecesarios
+        # Se obtiene la información de los campos solicitados, con .strip() se eliminan espacios en blanco innecesarios
+        id_partic = self.entryId.get().strip()
+        ciudad_nombre = self.entryCiudad.get().strip()
         departamento_nombre = self.entryDpto.get().strip()
         fecha = self.entryFecha.get().strip()
         nombre = self.entryNombre.get().strip()
@@ -539,15 +540,16 @@ class Participantes:
         query = 'SELECT * FROM t_participantes WHERE 1=1'
         parametros = [] # en esta tupla gurada el o los parámetos a consultar
 
+        # Añade los parámetros a la consulta si se ingresaron
         if id_partic:
-            query += ' AND Id = ?'   # añade este parametro si se desea buscar participantes por él
+            query += ' AND Id = ?'   
             parametros.append(id_partic)
 
         if fecha != "DD/MM/AAAA":  
             query += ' AND Fecha = ?'
             parametros.append(fecha)
 
-        # Usa leer_idCiudad()para obtener el ID de la ciudad si el usuario ingresó una ciudad
+        # Usa leer_idCiudad() para obtener el ID de la ciudad si el usuario ingresó una ciudad
         if ciudad_nombre:
             id_ciudad = self.leer_idCiudad()
             if id_ciudad:
@@ -555,12 +557,13 @@ class Participantes:
                 parametros.append(id_ciudad)
         
         if departamento_nombre:
+            # Extrae los Id_Ciudad de la tabla t_ciudades según el Nombre_Departamento
             query_id_ciudades = 'SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ?'
             ciudades_result = self.run_Query(query_id_ciudades, (departamento_nombre,))
-            id_ciudades = [row[0] for row in ciudades_result]  # Extrae los Id_Ciudad
-
+            id_ciudades = [row[0] for row in ciudades_result]
+            # Crea "?, ?, ?" dinámicos según la cantidad de ciudades encontradas
             if id_ciudades:
-                apuntador = ','.join(['?'] * len(id_ciudades))  # Crea "?, ?, ?" dinámico
+                apuntador = ','.join(['?'] * len(id_ciudades))  
                 query += f" AND Id_Ciudad IN ({apuntador})"
                 parametros.extend(id_ciudades)
            
@@ -569,17 +572,20 @@ class Participantes:
             parametros.append(nombre)
 
         # Ejecutar la consulta con los parámetros
-        resultado = (self.run_Query(query, tuple(parametros))).fetchall()   
+        resultado = (self.run_Query(query, tuple(parametros))).fetchall()
 
+        # Si hay resultados, mostrarlos en el Treeview
         if resultado:
+            # Insertar cada resultado en el Treeview
             for participante in resultado:
-                # Obtener la ciudad correspondiente al ID_Ciudad
+                # Obtener la ciudad correspondiente al ID_Ciudad, si no hay, se deja vacío.
                 ciudad_nombre = self.leer_nombreCiudad(participante[6]) if participante[6] is not None else ""
 
                 # Insertar el participante en el Treeview (grilla)
-                self.treeDatos.insert("", "end", text=participante[0], values=[    #coloca la info de cada columna del participante
-                    participante[1], ciudad_nombre, participante[2], participante[3], participante[4], participante[5]
-            ])
+                self.treeDatos.insert("", "end", text=participante[0], values=[participante[1], ciudad_nombre, 
+                                                                               participante[2], participante[3], 
+                                                                               participante[4], participante[5]])
+        # Si no hay resultados, mostrar un mensaje de error
         else:
             self.lee_tablaTreeView()
             mssg.showinfo("Sin resultados", "No se encontraron participantes con los criterios ingresados")
