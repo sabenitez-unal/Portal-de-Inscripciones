@@ -373,8 +373,8 @@ class Participantes:
         query = 'SELECT Nombre_Departamento FROM t_ciudades ORDER BY Nombre_Departamento'
         db_rows = self.run_Query(query)
         self.dptos = ['']
-        for row in db_rows:
-            if row[0] != self.dptos[-1]: self.dptos.append(row[0])
+        # Se obtienen los departamentos de la DB
+        for row in db_rows: self.dptos.append(row[0]) if row[0] != self.dptos[-1] else None
         self.dptos.remove('')
     
     def lee_listaCiudades(self, event=None):
@@ -386,7 +386,7 @@ class Participantes:
             self.entryCiudad.configure(state='readonly')
             query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ? ORDER BY Nombre_Ciudad'
             parametro = (self.entryDpto.get(),)
-            self.entryCiudad.set("")
+            # Se obtienen las ciudades del departamento seleccionado
             db_rows = self.run_Query(query, parametro)
             self.ciudades = [row[0] for row in db_rows]
             self.entryCiudad['values'] = self.ciudades
@@ -405,10 +405,8 @@ class Participantes:
 
         # Insertando los datos de la BD en la tabla de la pantalla
         for row in db_rows:
-            # Se carga la ciudad correspondiente al id de la ciudad.
-            if row[6] != None: ciudad = self.leer_nombreCiudad(row[6])
-            # Si id_ciudad es None, se deja vacío
-            else: ciudad = ''
+            # Se carga la ciudad correspondiente al id de la ciuda, si no hay, se deja vacío.
+            ciudad = self.leer_nombreCiudad(row[6]) if row[6] != None else ciudad = ''
             # Se insertan los datos en la tabla
             self.treeDatos.insert('',0, text = row[0], values = [row[1],ciudad,row[2],row[3],row[4],row[5]])
 
@@ -421,8 +419,7 @@ class Participantes:
         db_rows = self.run_Query(query, parametro)
   
         # Retorna el id de la ciudad y lo retorna para guardarlo o actualizarlo en la tabla t_participantes
-        for row in db_rows:
-            return row[0]
+        for row in db_rows: return row[0]
 
     def leer_nombreCiudad(self, id_ciudad):
         '''Lee el nombre de la ciudad seleccionada según el id de la ciudad'''
