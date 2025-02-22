@@ -67,7 +67,7 @@ class Participantes:
         self.entryDpto = ttk.Combobox(self.lblfrm_Datos, values=self.dptos)
         self.entryDpto.configure(exportselection="true", justify="left", width="27", state='readonly')
         self.entryDpto.grid(column="1", row="2", sticky="w")
-        self.entryDpto.bind('<<ComboboxSelected>>', self.lee_listaCiudades)
+        self.entryDpto.bind('<<ComboboxSelected>>', self.dpto_Seleccionado)
 
         #Label Ciudad
         self.lblCiudad = ttk.Label(self.lblfrm_Datos)
@@ -131,7 +131,6 @@ class Participantes:
         
         #Coloca un texto traslucido para guiar al usuario con el form de fecha       
         self.resetform_fecha()
-
 
         #Configuración del Label Frame    
         self.lblfrm_Datos.configure(height="410", relief="groove", text=" Inscripción ", width="330")
@@ -376,6 +375,13 @@ class Participantes:
         # Se obtienen los departamentos de la DB
         for row in db_rows: self.dptos.append(row[0]) if row[0] != self.dptos[-1] else None
         self.dptos.remove('')
+
+    def dpto_Seleccionado(self, event=None):
+        # Primero, se limpia la lista de ciudades
+        self.entryCiudad.set("")
+        self.entryCiudad['values'] = []
+        # Luego, se carga la lista de ciudades según el departamento seleccionado
+        self.lee_listaCiudades()
     
     def lee_listaCiudades(self, event=None):
         '''Carga los datos de la BD dentro de las opciones de la lista de ciudades dependiendo del departamento seleccionado'''
@@ -406,7 +412,7 @@ class Participantes:
         # Insertando los datos de la BD en la tabla de la pantalla
         for row in db_rows:
             # Se carga la ciudad correspondiente al id de la ciuda, si no hay, se deja vacío.
-            ciudad = self.leer_nombreCiudad(row[6]) if row[6] != None else ciudad = ''
+            ciudad = self.leer_nombreCiudad(row[6]) if row[6] != None else ""
             # Se insertan los datos en la tabla
             self.treeDatos.insert('',0, text = row[0], values = [row[1],ciudad,row[2],row[3],row[4],row[5]])
 
@@ -449,7 +455,6 @@ class Participantes:
             # Se muestra un mensaje de confirmación
             mssg.showinfo('Ok',' Registro actualizado con éxito')
             self.limpia_Campos()
-            self.win.focus_set()  #saca el cursor de los entry
 
         # Adiciona un nuevo registro si la variable actualiza es False
         else:
@@ -474,7 +479,7 @@ class Participantes:
             elif not self.valida_Fecha():
                 mssg.showerror("¡ Atención !","Debe completar el campo de fecha con una fecha valida en formato DD-MM-AAAA")
         # Actualiza la tabla
-        self.win.focus_set()
+        self.win.focus_set() # Saca el cursor de los entry
         self.lee_tablaTreeView()
         
     def edita_tablaTreeView(self, event=None):
