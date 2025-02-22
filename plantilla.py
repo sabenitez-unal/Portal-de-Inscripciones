@@ -10,7 +10,7 @@ from datetime import datetime as dt
 class Participantes:
     # nombre de la base de datos  y ruta 
     path = str(Path.Path(__file__).parent)
-    db_name = path + r'/Participantes.db'
+    db_name = path + r'\Participantes.db'
     actualiza = None
     def __init__(self, master=None):
 
@@ -21,7 +21,7 @@ class Participantes:
         self.win.configure(background="Cadetblue3", height="480", relief="flat", width="1024")
         self.win.geometry("1024x480")
         self.centrar_ventana()
-        self.path = self.path +r'/cubo.ico'
+        self.path = self.path +r'\cubo.ico'
         self.win.iconbitmap(self.path)
         self.win.resizable(False, False)
         self.win.title("Portal de Inscripciones")
@@ -67,7 +67,7 @@ class Participantes:
         self.entryDpto = ttk.Combobox(self.lblfrm_Datos, values=self.dptos)
         self.entryDpto.configure(exportselection="true", justify="left", width="27", state='readonly')
         self.entryDpto.grid(column="1", row="2", sticky="w")
-        self.entryDpto.bind('<<ComboboxSelected>>', self.lee_listaCiudades)
+        self.entryDpto.bind('<<ComboboxSelected>>', self.dpto_Seleccionado)
 
         #Label Ciudad
         self.lblCiudad = ttk.Label(self.lblfrm_Datos)
@@ -124,44 +124,49 @@ class Participantes:
         self.entryFecha = tk.Entry(self.lblfrm_Datos,foreground="gray55")
         self.entryFecha.configure(exportselection="true", justify="left",relief="groove", width="30")
         self.entryFecha.grid(column="1", row="7", sticky="w")
-        # Valida fecha al borrar con backSpace
-        self.entryFecha.bind("<BackSpace>", lambda event: self.valida_Fecha(True))
         # Valida fecha al escribir
-        self.entryFecha.bind("<Key>", lambda event: self.valida_Fecha(False))
+        self.entryFecha.bind("<KeyRelease>", self.valida_Fecha)
         
         #Coloca un texto traslucido para guiar al usuario con el form de fecha       
         self.resetform_fecha()
-
 
         #Configuración del Label Frame    
         self.lblfrm_Datos.configure(height="410", relief="groove", text=" Inscripción ", width="330")
         self.lblfrm_Datos.place(anchor="nw", relx="0.01", rely="0.05", width="280", x="0", y="0")
         self.lblfrm_Datos.grid_propagate(0)
 
+        #estilo para los botones
         self.btn_style = ttk.Style()
         self.btn_style.configure("TButton", font=("SegoeUI", 8, "bold") , background ='#4682B4')
         self.btn_style.map("TButton", background=[('active', 'turquoise1'), ('!pressed', '#4682B4')]) 
                       
         #Botón Grabar
         self.btnGrabar = ttk.Button(self.win, text="Grabar", width="9", style="TButton", command=self.adiciona_Registro, takefocus=False)
-        self.btnGrabar.place(anchor="nw", relx="0.01", rely="0.75", x="0", y="75")
+        self.btnGrabar.place(anchor="nw", relx="0.01", rely="0.75", x="0", y="80")
 
-        
         #Botón Editar
         self.btnEditar = ttk.Button(self.win, text="Editar", width="9", style="TButton", command=self.edita_tablaTreeView, takefocus=False)
-        self.btnEditar.place(anchor="nw", rely="0.75", x="80", y="75")
+        self.btnEditar.place(anchor="nw", rely="0.75", x="80", y="80")
 
-        
         #Botón Eliminar
         self.btnEliminar = ttk.Button(self.win, text="Eliminar", width="9", style="TButton", command=self.elimina_Registro, takefocus=False)
-        self.btnEliminar.place(anchor="nw", rely="0.75", x="152", y="75")
+        self.btnEliminar.place(anchor="nw", rely="0.75", x="152", y="80")
 
-        
         #Botón Cancelar
         self.btnCancelar = ttk.Button(self.win)
-        self.btnCancelar.configure(text="Cancelar", width="9",command=self.limpia_Campos, style="TButton")
-        self.btnCancelar.place(anchor="nw", rely="0.75", x="225", y="75")
+        self.btnCancelar.configure(text="Cancelar", width="9",command=lambda : [self.limpia_Campos(), self.lee_tablaTreeView()], style="TButton")
+        self.btnCancelar.place(anchor="nw", rely="0.75", x="225", y="80")
         
+        #Botón Consultar
+        self.btnConsultar = ttk.Button(self.win)
+        self.btnConsultar.configure(text="Consultar Datos", width="18",command=self.consulta_participantes, style="TButton")
+        self.btnConsultar.place(anchor="nw", rely="0.75", x="770", y="80")
+
+        #Botón Cerrar Ventana
+        self.btnCerrarV = ttk.Button(self.win)
+        self.btnCerrarV.configure(text="Finalizar Inscripción", width="18",command=self.win.destroy, style="TButton")
+        self.btnCerrarV.place(anchor="nw", rely="0.75", x="895", y="80")
+
         #tablaTreeView
         self.style=ttk.Style()
         self.style.configure("estilo.Treeview", highlightthickness=0, bd=0, background='AliceBlue', font=('Calibri Light',10))
@@ -194,11 +199,11 @@ class Participantes:
         #Scrollbar en el eje Y de treeDatos
         self.scrollbar=ttk.Scrollbar(self.win, orient='vertical', command=self.treeDatos.yview)
         self.treeDatos.configure(yscroll=self.scrollbar.set)
-        self.scrollbar.place(x=1000, y=50, height=400)
+        self.scrollbar.place(x=1000, y=33, height=390)
 
         #Carga los datos en treeDatos
         self.lee_tablaTreeView()    
-        self.treeDatos.place(anchor="nw", height="400", rely="0.1", width="700", x="300", y="0")
+        self.treeDatos.place(anchor="nw", height="400", rely="0.1", width="700", x="295", y="-15")
 
     def centrar_ventana(self): #centra la ventana en el centro de la pantalla
             """ Centra la ventana en la pantalla """
@@ -222,40 +227,47 @@ class Participantes:
 
     def valida_Identificacion(self, event=None):
         ''' Valida que la longitud no sea mayor a 15 caracteres y únicamente sean números'''
+        # Si se presiona una tecla, se valida que sea un número y que no se exceda la longitud de 15 caracteres
         if event.char:
             try:
                 int(self.entryId.get())
                 if len(self.entryId.get()) >= 15:
                     mssg.showerror('¡Atención!','... ¡Máximo 15 caracteres! ...')
                     self.entryId.delete(15,"end")
-            except:
-                self.entryId.delete(len(self.entryId.get())-1, 'end')
-        else:
-              self.entryId.delete(15,"end")
+            # Si no es un número, borra el último caracter
+            except: self.entryId.delete(len(self.entryId.get())-1, 'end')
+        # Si se pega un texto, se valida que sea un número y que no se exceda la longitud de 15 caracteres
+        else: self.entryId.delete(15,"end")
 
-    def valida_Fecha(self, borrando=False):
+    def valida_Fecha(self, event=None, btn_pressed=False):
         '''Valida que la fecha insertada sea válida y le da formato DD-MM-AAAA'''
 
-        # Inserta los guiones en la fecha de forma automatica
-        if not borrando:
-            if len(self.entryFecha.get()) == 2:
-                self.entryFecha.insert(2, '/')
-            elif len(self.entryFecha.get()) == 5:
-                self.entryFecha.insert(5, '/')
-
+        # Si no hay nada escrito, la fecha es inválida
+        if (self.entryFecha.get() == "DD/MM/AAAA"): return False
         # Obtener el texto del Entry
-        fecha_texto = self.entryFecha.get()    
-        if (fecha_texto == "DD/MM/AAAA"):
-            return False  # Si no hay nada escrito, la fecha es inválida
+        fecha_texto = self.entryFecha.get()
+        # Inicializar la variable de la fecha en formato
+        fecha_formato = fecha_texto if btn_pressed else ""
+
+        # Inserta los guiones en la fecha de forma automatica
+        if not btn_pressed and event.keysym != 'BackSpace' and event.keysym != 'Delete':
+            # Inserta los guiones en la fecha de forma automática
+            for i, num in enumerate(fecha_texto):
+                if i == 2 or i == 5: fecha_formato += '/'
+                # Comprueba que la tecla no sea una letra, si lo es, la ignora
+                if num.isdigit(): fecha_formato += num
+            self.entryFecha.delete(0, 'end')
+            self.entryFecha.insert(0, fecha_formato)
         
-        #verifica que la fecha no sea mayor a 10 caracteres
-        if len(fecha_texto) > 9 and not borrando:
+        # verifica que la fecha no sea mayor a 10 caracteres
+        if len(fecha_formato) > 10:
             mssg.showerror("¡Error!", "Inserte una fecha válida, por favor.")
-            self.entryFecha.delete(9, tk.END)  
+            self.entryFecha.delete(10, 'end')  
         
         try: # Intentar convertir el texto a un objeto datetime
-            dt.strptime(fecha_texto, "%d/%m/%Y")  # Formato esperado: DD/MM/YYYY
-            return True 
+            # Formato esperado: DD/MM/YYYY
+            dt.strptime(fecha_formato, "%d/%m/%Y")
+            return True # Si no hay error, la fecha es válida
         except ValueError:
             return False  # Si hay error, la fecha es inválida    
 
@@ -290,8 +302,8 @@ class Participantes:
             if len(self.entryCelular.get()) >= 10:
                 mssg.showerror('¡Atención!', 'Máximo 10 dígitos')
                 self.entryCelular.delete(10, 'end')  
-        except: # Si no es un número, lo borra.
-            self.entryCelular.delete(len(self.entryCelular.get())-1, 'end')
+        # Si no es un número, lo borra.
+        except: self.entryCelular.delete(len(self.entryCelular.get())-1, 'end')
 
     def carga_Datos(self):
         ''' Carga los datos en los campos desde el treeView'''
@@ -365,9 +377,16 @@ class Participantes:
         query = 'SELECT Nombre_Departamento FROM t_ciudades ORDER BY Nombre_Departamento'
         db_rows = self.run_Query(query)
         self.dptos = ['']
-        for row in db_rows:
-            if row[0] != self.dptos[-1]: self.dptos.append(row[0])
+        # Se obtienen los departamentos de la DB
+        for row in db_rows: self.dptos.append(row[0]) if row[0] != self.dptos[-1] else None
         self.dptos.remove('')
+
+    def dpto_Seleccionado(self, event=None):
+        # Primero, se limpia la lista de ciudades
+        self.entryCiudad.set("")
+        self.entryCiudad['values'] = []
+        # Luego, se carga la lista de ciudades según el departamento seleccionado
+        self.lee_listaCiudades()
     
     def lee_listaCiudades(self, event=None):
         '''Carga los datos de la BD dentro de las opciones de la lista de ciudades dependiendo del departamento seleccionado'''
@@ -378,6 +397,7 @@ class Participantes:
             self.entryCiudad.configure(state='readonly')
             query = 'SELECT Nombre_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ? ORDER BY Nombre_Ciudad'
             parametro = (self.entryDpto.get(),)
+            # Se obtienen las ciudades del departamento seleccionado
             db_rows = self.run_Query(query, parametro)
             self.ciudades = [row[0] for row in db_rows]
             self.entryCiudad['values'] = self.ciudades
@@ -396,10 +416,8 @@ class Participantes:
 
         # Insertando los datos de la BD en la tabla de la pantalla
         for row in db_rows:
-            # Se carga la ciudad correspondiente al id de la ciudad.
-            if row[6] != None: ciudad = self.leer_nombreCiudad(row[6])
-            # Si id_ciudad es None, se deja vacío
-            else: ciudad = ''
+            # Se carga la ciudad correspondiente al id de la ciuda, si no hay, se deja vacío.
+            ciudad = self.leer_nombreCiudad(row[6]) if row[6] != None else ""
             # Se insertan los datos en la tabla
             self.treeDatos.insert('',0, text = row[0], values = [row[1],ciudad,row[2],row[3],row[4],row[5]])
 
@@ -412,8 +430,7 @@ class Participantes:
         db_rows = self.run_Query(query, parametro)
   
         # Retorna el id de la ciudad y lo retorna para guardarlo o actualizarlo en la tabla t_participantes
-        for row in db_rows:
-            return row[0]
+        for row in db_rows: return row[0]
 
     def leer_nombreCiudad(self, id_ciudad):
         '''Lee el nombre de la ciudad seleccionada según el id de la ciudad'''
@@ -429,7 +446,7 @@ class Participantes:
         '''Adiciona un producto a la BD si la validación es True'''
 
         # Actualiza un registro si la variable actualiza es True
-        if self.actualiza and self.valida_Fecha():
+        if self.actualiza and self.valida_Fecha(btn_pressed=True):
             self.actualiza = None
             self.entryId.configure(state = 'readonly')
 
@@ -443,7 +460,7 @@ class Participantes:
             # Se muestra un mensaje de confirmación
             mssg.showinfo('Ok',' Registro actualizado con éxito')
             self.limpia_Campos()
-            
+
         # Adiciona un nuevo registro si la variable actualiza es False
         else:
             # Query para insertar un nuevo registro, con id_ciudad vacío para guardarlo despúes.
@@ -451,7 +468,7 @@ class Participantes:
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryDireccion.get(),
                           self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.leer_idCiudad())
             # Valida que el Id no esté vacío y la fecha sea valida
-            if self.valida() and self.valida_Fecha():
+            if self.valida() and self.valida_Fecha(btn_pressed=True):
                 # Intenta insertar el registro
                 try:
                     self.run_Query(query, parametros)
@@ -464,10 +481,10 @@ class Participantes:
             elif not self.valida():
                 mssg.showerror("¡ Atención !","No puede dejar la identificación vacía")
             # Si la fecha no es válida, se muestra un mensaje de error
-            elif not self.valida_Fecha():
-                mssg.showerror("¡ Atención !","Debe completar el campo de fecha con una fecha valida en formato DD-MM-AAAA")
-                self.resetform_fecha()
+            elif not self.valida_Fecha(btn_pressed=True):
+                mssg.showerror("¡ Atención !","Debe completar el campo de fecha con una fecha valida en formato DD/MM/AAAA")
         # Actualiza la tabla
+        self.win.focus_set() # Saca el cursor de los entry
         self.lee_tablaTreeView()
         
     def edita_tablaTreeView(self, event=None):
@@ -506,6 +523,79 @@ class Participantes:
 
         # Actualiza la tabla
         self.lee_tablaTreeView()
+    
+    def consulta_participantes(self):
+        '''Filtra el Treeview según el ID, Nombre, Ciudad, Departamento o Fecha ingresados'''
+    
+        # Se obtiene la información de los campos solicitados, con .strip() se eliminan espacios en blanco innecesarios
+        id_partic = self.entryId.get().strip()
+        ciudad_nombre = self.entryCiudad.get().strip()
+        departamento_nombre = self.entryDpto.get().strip()
+        fecha = self.entryFecha.get().strip()
+        nombre = self.entryNombre.get().strip()
+    
+        # Si no se ingresa ningún filtro en los entry, mostrará el error
+        if not (id_partic or ciudad_nombre or departamento_nombre or (fecha != "DD/MM/AAAA")  or nombre):
+            mssg.showerror("Error", "Por favor, ingrese al menos un criterio de búsqueda")
+            return
+    
+        # Limpia el Treeview antes de mostrar resultados
+        for item in self.treeDatos.get_children():
+            self.treeDatos.delete(item)
+
+        # Construir la consulta dinámica según los filtros ingresados
+        query = 'SELECT * FROM t_participantes WHERE 1=1'
+        parametros = [] # en esta tupla gurada el o los parámetos a consultar
+
+        # Añade los parámetros a la consulta si se ingresaron
+        if id_partic:
+            query += ' AND Id = ?'   
+            parametros.append(id_partic)
+
+        if fecha != "DD/MM/AAAA":  
+            query += ' AND Fecha = ?'
+            parametros.append(fecha)
+
+        # Usa leer_idCiudad() para obtener el ID de la ciudad si el usuario ingresó una ciudad
+        if ciudad_nombre:
+            id_ciudad = self.leer_idCiudad()
+            if id_ciudad:
+                query += ' AND Id_Ciudad = ?'
+                parametros.append(id_ciudad)
+        
+        if departamento_nombre:
+            # Extrae los Id_Ciudad de la tabla t_ciudades según el Nombre_Departamento
+            query_id_ciudades = 'SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ?'
+            ciudades_result = self.run_Query(query_id_ciudades, (departamento_nombre,))
+            id_ciudades = [row[0] for row in ciudades_result]
+            # Crea "?, ?, ?" dinámicos según la cantidad de ciudades encontradas
+            if id_ciudades:
+                apuntador = ','.join(['?'] * len(id_ciudades))  
+                query += f" AND Id_Ciudad IN ({apuntador})"
+                parametros.extend(id_ciudades)
+           
+        if nombre:
+            query += ' AND Nombre = ?'
+            parametros.append(nombre)
+
+        # Ejecutar la consulta con los parámetros
+        resultado = (self.run_Query(query, tuple(parametros))).fetchall()
+
+        # Si hay resultados, mostrarlos en el Treeview
+        if resultado:
+            # Insertar cada resultado en el Treeview
+            for participante in resultado:
+                # Obtener la ciudad correspondiente al ID_Ciudad, si no hay, se deja vacío.
+                ciudad_nombre = self.leer_nombreCiudad(participante[6]) if participante[6] is not None else ""
+
+                # Insertar el participante en el Treeview (grilla)
+                self.treeDatos.insert("", "end", text=participante[0], values=[participante[1], ciudad_nombre, 
+                                                                               participante[2], participante[3], 
+                                                                               participante[4], participante[5]])
+        # Si no hay resultados, mostrar un mensaje de error
+        else:
+            self.lee_tablaTreeView()
+            mssg.showinfo("Sin resultados", "No se encontraron participantes con los criterios ingresados")
             
 # Inicio de la aplicación
 if __name__ == "__main__":
