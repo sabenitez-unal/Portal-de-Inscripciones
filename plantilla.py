@@ -150,21 +150,23 @@ class Participantes:
 
         #Botón Eliminar
         self.btnEliminar = ttk.Button(self.win, text="Eliminar", width="9", style="TButton", command=self.elimina_Registro, takefocus=False)
-        self.btnEliminar.place(anchor="nw", rely="0.75", x="152", y="80")
+        self.btnEliminar.place(anchor="nw", rely="0.75", x="150", y="80")
 
         #Botón Cancelar
         self.btnCancelar = ttk.Button(self.win)
-        self.btnCancelar.configure(text="Cancelar", width="9",command=lambda : [self.limpia_Campos(), self.lee_tablaTreeView()], style="TButton")
-        self.btnCancelar.place(anchor="nw", rely="0.75", x="225", y="80")
+        self.btnCancelar.configure(text="Cancelar", width="9",command=lambda : [self.limpia_Campos(), self.lee_tablaTreeView()], style="TButton", takefocus=False)
+        self.btnCancelar.place(anchor="nw", rely="0.75", x="220", y="80")
         
+        #Botón Seleccionar todos los participantes
+        self.btnCerrarV = ttk.Button(self.win, text="Select all", width="9",command=self.selec_all, style="TButton", takefocus=False)
+        self.btnCerrarV.place(anchor="nw", rely="0.75", x="290", y="80")
+
         #Botón Consultar
-        self.btnConsultar = ttk.Button(self.win)
-        self.btnConsultar.configure(text="Consultar Datos", width="18",command=self.consulta_participantes, style="TButton")
+        self.btnConsultar = ttk.Button(self.win, text="Consultar Datos", width="18",command=self.consulta_participantes, style="TButton", takefocus=False)
         self.btnConsultar.place(anchor="nw", rely="0.75", x="770", y="80")
 
         #Botón Cerrar Ventana
-        self.btnCerrarV = ttk.Button(self.win)
-        self.btnCerrarV.configure(text="Finalizar Inscripción", width="18",command=self.win.destroy, style="TButton")
+        self.btnCerrarV = ttk.Button(self.win, text="Finalizar Inscripción", width="18",command=self.win.destroy, style="TButton", takefocus=False)
         self.btnCerrarV.place(anchor="nw", rely="0.75", x="895", y="80")
 
         #tablaTreeView
@@ -173,7 +175,7 @@ class Participantes:
         self.style.configure("estilo.Treeview.Heading", background='Azure', font=('Calibri Light', 10,'bold')) 
         self.style.layout("estilo.Treeview", [('estilo.Treeview.treearea', {'sticky': 'nswe'})])
 
-        self.treeDatos = ttk.Treeview(self.win, height = 10, style="estilo.Treeview")
+        self.treeDatos = ttk.Treeview(self.win, height = 10, selectmode="extended", style="estilo.Treeview")
         self.treeDatos.place(x=380, y=0, height=410, width = 500)
 
        # Etiquetas de las columnas
@@ -196,6 +198,9 @@ class Participantes:
         self.treeDatos.heading('Entidad',  text = 'Entidad')
         self.treeDatos.heading('Fecha',    text = 'Fecha')
 
+        # Eventos para la selección múltiple
+        self.treeDatos.bind("<B1-Motion>", self.arrastre_seleccion)
+
         #Scrollbar en el eje Y de treeDatos
         self.scrollbar=ttk.Scrollbar(self.win, orient='vertical', command=self.treeDatos.yview)
         self.treeDatos.configure(yscroll=self.scrollbar.set)
@@ -204,6 +209,19 @@ class Participantes:
         #Carga los datos en treeDatos
         self.lee_tablaTreeView()    
         self.treeDatos.place(anchor="nw", height="400", rely="0.1", width="700", x="295", y="-15")
+            
+    def arrastre_seleccion(self, event):
+        '''Permite la selección de múltiples elementos al arrastrar el mouse.'''
+        id_fila = self.treeDatos.identify_row(event.y)  # captura un evento si el cursor se arrasta sobre el treview
+        if id_fila:
+            self.treeDatos.selection_add(id_fila) 
+
+    def selec_all(self):
+        '''Selecciona todos los elementos del Treeview.'''
+        for item in self.treeDatos.get_children():
+            self.treeDatos.selection_add(item)
+        mssg.showinfo("Info", "Todos los elementos han sido seleccionados") 
+
 
     def centrar_ventana(self): #centra la ventana en el centro de la pantalla
             """ Centra la ventana en la pantalla """
@@ -490,7 +508,7 @@ class Participantes:
     def edita_tablaTreeView(self, event=None):
         '''Edita un registro seleccionado de la tabla'''   
         # Valida que se haya seleccionado un registro
-        if self.treeDatos.selection():
+        if len(self.treeDatos.selection()) == 1:
             # Carga los campos desde la tabla TreeView
             self.treeDatos.item(self.treeDatos.selection())['text']
             
@@ -502,6 +520,9 @@ class Participantes:
             self.carga_Datos()
             self.lee_listaCiudades()
         # Si no se selecciona un registro, muestra un mensaje de error
+        elif len(self.treeDatos.selection()) > 1:
+            self.actualiza = None
+            mssg.showerror("¡ Atención !",'Por favor, solo un ítem de la tabla')
         else:
             self.actualiza = None
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
