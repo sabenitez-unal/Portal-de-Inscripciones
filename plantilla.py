@@ -124,10 +124,8 @@ class Participantes:
         self.entryFecha = tk.Entry(self.lblfrm_Datos,foreground="gray55")
         self.entryFecha.configure(exportselection="true", justify="left",relief="groove", width="30")
         self.entryFecha.grid(column="1", row="7", sticky="w")
-        # Valida fecha al borrar con backSpace
-        self.entryFecha.bind("<BackSpace>", lambda event: self.valida_Fecha(True))
         # Valida fecha al escribir
-        self.entryFecha.bind("<Key>", lambda event: self.valida_Fecha(False))
+        self.entryFecha.bind("<KeyRelease>", self.valida_Fecha)
         
         #Coloca un texto traslucido para guiar al usuario con el form de fecha       
         self.resetform_fecha()
@@ -240,11 +238,11 @@ class Participantes:
         else:
               self.entryId.delete(15,"end")
 
-    def valida_Fecha(self, borrando=False):
+    def valida_Fecha(self, event=None):
         '''Valida que la fecha insertada sea válida y le da formato DD-MM-AAAA'''
 
         # Inserta los guiones en la fecha de forma automatica
-        if not borrando:
+        if event.keysym != 'BackSpace' and event.keysym != 'Delete':
             if len(self.entryFecha.get()) == 2:
                 self.entryFecha.insert(2, '/')
             elif len(self.entryFecha.get()) == 5:
@@ -256,7 +254,7 @@ class Participantes:
             return False  # Si no hay nada escrito, la fecha es inválida
         
         #verifica que la fecha no sea mayor a 10 caracteres
-        if len(fecha_texto) > 10 and not borrando:
+        if len(fecha_texto) > 10:
             mssg.showerror("¡Error!", "Inserte una fecha válida, por favor.")
             self.entryFecha.delete(10, tk.END)  
         
