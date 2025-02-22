@@ -518,16 +518,16 @@ class Participantes:
         self.lee_tablaTreeView()
     
     def consulta_participantes(self):
-        """ Filtra el Treeview según el ID, Ciudad, Departamento o Fecha ingresados """
+        """ Filtra el Treeview según el ID, Nombre, Ciudad, Departamento o Fecha ingresados """
     
-        id_partic = self.entryId.get().strip()        # obtiene info del campo solicitado
-        ciudad = self.entryCiudad.get().strip()       # con .strip() elimina espacios en blanco inecesarios
-        departamento = self.entryDpto.get().strip()
+        id_partic = self.entryId.get().strip()               # obtiene info del campo solicitado
+        ciudad_nombre = self.entryCiudad.get().strip()       # con .strip() elimina espacios en blanco inecesarios
+        departamento_nombre = self.entryDpto.get().strip()
         fecha = self.entryFecha.get().strip()
         nombre = self.entryNombre.get().strip()
     
-        # Si no se ingresa ningún filtro, mostrará el error
-        if not (id_partic or ciudad or departamento or (fecha != "DD/MM/AAAA")  or nombre):
+        # Si no se ingresa ningún filtro en los entry, mostrará el error
+        if not (id_partic or ciudad_nombre or departamento_nombre or (fecha != "DD/MM/AAAA")  or nombre):
             mssg.showerror("Error", "Por favor, ingrese al menos un criterio de búsqueda")
             return
     
@@ -536,44 +536,47 @@ class Participantes:
             self.treeDatos.delete(item)
 
         # Construir la consulta dinámica según los filtros ingresados
-        query = "SELECT * FROM t_participantes WHERE 1=1"
+        query = 'SELECT * FROM t_participantes WHERE 1=1'
         parametros = [] # en esta tupla gurada el o los parámetos a consultar
 
         if id_partic:
-            query += " AND Id = ?"   # añade este parametro si se desea buscar participantes por él
+            query += ' AND Id = ?'   # añade este parametro si se desea buscar participantes por él
             parametros.append(id_partic)
 
         if fecha != "DD/MM/AAAA":  
-            query += " AND Fecha = ?"
+            query += ' AND Fecha = ?'
             parametros.append(fecha)
 
-        if ciudad:
-            query += " AND Id_Ciudad IN (SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ?)"
-            parametros.append(ciudad)
+        # Usa leer_idCiudad()para obtener el ID de la ciudad si el usuario ingresó una ciudad
+        if ciudad_nombre:
+            id_ciudad = self.leer_idCiudad()
+            if id_ciudad:
+                query += ' AND Id_Ciudad = ?'
+                parametros.append(id_ciudad)
+        
+        if departamento_nombre:
+            query_id_ciudades = 'SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ?'
+            ciudades_result = self.run_Query(query_id_ciudades, (departamento_nombre,))
+            id_ciudades = [row[0] for row in ciudades_result]  # Extrae los Id_Ciudad
 
-        if departamento:
-            query += " AND Id_Ciudad IN (SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Departamento = ?)"
-            parametros.append(departamento)
-
+            if id_ciudades:
+                apuntador = ','.join(['?'] * len(id_ciudades))  # Crea "?, ?, ?" dinámico
+                query += f" AND Id_Ciudad IN ({apuntador})"
+                parametros.extend(id_ciudades)
+           
         if nombre:
-            query += " AND Nombre = ?"
+            query += ' AND Nombre = ?'
             parametros.append(nombre)
 
         # Ejecutar la consulta con los parámetros
-        resultado = self.run_Query(query, tuple(parametros))
+        resultado = (self.run_Query(query, tuple(parametros))).fetchall()   
 
-        participantes = resultado.fetchall()  # Obtener todos los resultados que tengan el parametro deseado
-
-        if participantes:
-            for participante in participantes:
+        if resultado:
+            for participante in resultado:
                 # Obtener la ciudad correspondiente al ID_Ciudad
-                ciudad_nombre = ""
-                if participante[6] is not None:
-                    query = "SELECT Nombre_Ciudad FROM t_ciudades WHERE Id_Ciudad = ?"
-                    ciudad_result = self.run_Query(query, (participante[6],)).fetchone()
-                    ciudad_nombre = ciudad_result[0] if ciudad_result else ""
+                ciudad_nombre = self.leer_nombreCiudad(participante[6]) if participante[6] is not None else ""
 
-                # Insertar el participante en el Treeview
+                # Insertar el participante en el Treeview (grilla)
                 self.treeDatos.insert("", "end", text=participante[0], values=[    #coloca la info de cada columna del participante
                     participante[1], ciudad_nombre, participante[2], participante[3], participante[4], participante[5]
             ])
