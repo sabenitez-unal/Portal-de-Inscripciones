@@ -26,6 +26,10 @@ class Participantes:
         self.win.resizable(False, False)
         self.win.title("Portal de Inscripciones")
         self.win.pack_propagate(0) 
+
+        # Estilo de la ventana
+        style = ttk.Style()
+        style.theme_use("clam")
         
         # Main widget
         self.mainwindow = self.win
