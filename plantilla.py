@@ -239,18 +239,18 @@ class Participantes:
         # Si se pega un texto, se valida que sea un número y que no se exceda la longitud de 15 caracteres
         else: self.entryId.delete(15,"end")
 
-    def valida_Fecha(self, event=None):
+    def valida_Fecha(self, event=None, btn_pressed=False):
         '''Valida que la fecha insertada sea válida y le da formato DD-MM-AAAA'''
 
         # Si no hay nada escrito, la fecha es inválida
         if (self.entryFecha.get() == "DD/MM/AAAA"): return False
         # Obtener el texto del Entry
         fecha_texto = self.entryFecha.get()
-        # Se crea una variable para almacenar la fecha con el formato de barras
-        fecha_formato = ''
+        # Inicializar la variable de la fecha en formato
+        fecha_formato = fecha_texto if btn_pressed else ""
 
         # Inserta los guiones en la fecha de forma automatica
-        if event.keysym != 'BackSpace' and event.keysym != 'Delete':
+        if not btn_pressed and event.keysym != 'BackSpace' and event.keysym != 'Delete':
             # Inserta los guiones en la fecha de forma automática
             for i, num in enumerate(fecha_texto):
                 if i == 2 or i == 5: fecha_formato += '/'
@@ -259,13 +259,14 @@ class Participantes:
             self.entryFecha.delete(0, 'end')
             self.entryFecha.insert(0, fecha_formato)
         
-        #verifica que la fecha no sea mayor a 10 caracteres
+        # verifica que la fecha no sea mayor a 10 caracteres
         if len(fecha_formato) > 10:
             mssg.showerror("¡Error!", "Inserte una fecha válida, por favor.")
             self.entryFecha.delete(10, 'end')  
         
         try: # Intentar convertir el texto a un objeto datetime
-            dt.strptime(fecha_formato, "%d/%m/%Y")  # Formato esperado: DD/MM/YYYY
+            # Formato esperado: DD/MM/YYYY
+            dt.strptime(fecha_formato, "%d/%m/%Y")
             return True # Si no hay error, la fecha es válida
         except ValueError:
             return False  # Si hay error, la fecha es inválida    
@@ -445,7 +446,7 @@ class Participantes:
         '''Adiciona un producto a la BD si la validación es True'''
 
         # Actualiza un registro si la variable actualiza es True
-        if self.actualiza and self.valida_Fecha():
+        if self.actualiza and self.valida_Fecha(btn_pressed=True):
             self.actualiza = None
             self.entryId.configure(state = 'readonly')
 
@@ -467,7 +468,7 @@ class Participantes:
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryDireccion.get(),
                           self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.leer_idCiudad())
             # Valida que el Id no esté vacío y la fecha sea valida
-            if self.valida() and self.valida_Fecha():
+            if self.valida() and self.valida_Fecha(btn_pressed=True):
                 # Intenta insertar el registro
                 try:
                     self.run_Query(query, parametros)
@@ -480,8 +481,8 @@ class Participantes:
             elif not self.valida():
                 mssg.showerror("¡ Atención !","No puede dejar la identificación vacía")
             # Si la fecha no es válida, se muestra un mensaje de error
-            elif not self.valida_Fecha():
-                mssg.showerror("¡ Atención !","Debe completar el campo de fecha con una fecha valida en formato DD-MM-AAAA")
+            elif not self.valida_Fecha(btn_pressed=True):
+                mssg.showerror("¡ Atención !","Debe completar el campo de fecha con una fecha valida en formato DD/MM/AAAA")
         # Actualiza la tabla
         self.win.focus_set() # Saca el cursor de los entry
         self.lee_tablaTreeView()
