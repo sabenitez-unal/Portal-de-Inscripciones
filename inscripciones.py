@@ -184,13 +184,13 @@ class Participantes:
        # Etiquetas de las columnas
         self.treeDatos["columns"]=("Nombre","Ciudad","Dirección","Celular","Entidad","Fecha")
         # Determina el espacio a mostrar que ocupa el código
-        self.treeDatos.column('#0',         anchor="w", stretch="true", width=60)
-        self.treeDatos.column('Nombre',     stretch="true",             width=60)
-        self.treeDatos.column('Ciudad',     stretch="true",             width=40)
-        self.treeDatos.column('Dirección',  stretch="true",             width=65)
-        self.treeDatos.column('Celular',    stretch="true",             width=30)
-        self.treeDatos.column('Entidad',    stretch="true",             width=60)
-        self.treeDatos.column('Fecha',      stretch="true",             width=25) 
+        self.treeDatos.column('#0',         anchor="w", stretch="true", width=50)
+        self.treeDatos.column('Nombre',     stretch="true",             width=50)
+        self.treeDatos.column('Ciudad',     stretch="true",             width=50)
+        self.treeDatos.column('Dirección',  stretch="true",             width=50)
+        self.treeDatos.column('Celular',    stretch="true",             width=50)
+        self.treeDatos.column('Entidad',    stretch="true",             width=50)
+        self.treeDatos.column('Fecha',      stretch="true",             width=50) 
         # Encabezados de las columnas de la pantalla
         self.treeDatos.heading('#0',       text = 'Id')
         self.treeDatos.heading('Nombre',   text = 'Nombre')
@@ -203,9 +203,14 @@ class Participantes:
         self.treeDatos.bind("<B1-Motion>", self.arrastre_seleccion)
 
         #Scrollbar en el eje Y de treeDatos
-        self.scrollbar=ttk.Scrollbar(self.frm_treeView, orient='vertical', command=self.treeDatos.yview)
-        self.treeDatos.configure(yscroll=self.scrollbar.set)
-        self.scrollbar.place(relx=0.99, rely=0.03, relheight=0.95, anchor='ne')
+        self.scrollbary=ttk.Scrollbar(self.frm_treeView, orient='vertical', command=self.treeDatos.yview)
+        self.treeDatos.configure(yscroll=self.scrollbary.set)
+        self.scrollbary.place(relx=0.99, rely=0.03, relheight=0.95, anchor='ne')
+
+        #Scrollbar en el eje x de treeDatos
+        self.scrollbarx=ttk.Scrollbar(self.frm_treeView, orient='horizontal', command=self.treeDatos.xview)
+        self.treeDatos.configure(xscroll=self.scrollbarx.set)
+        self.scrollbarx.place(relx=0.01, rely=0.98, relwidth=0.95, anchor='sw')
 
         #Carga los datos en treeDatos
         self.lee_tablaTreeView()    
@@ -249,7 +254,7 @@ class Participantes:
         if event.char:
             try:
                 int(self.entryId.get())
-                if len(self.entryId.get()) > 15:
+                if len(self.entryId.get()) >= 15:
                     mssg.showerror('¡Atención!','... ¡Máximo 15 caracteres! ...')
                     self.entryId.delete(15,"end")
             # Si no es un número, borra el último caracter
@@ -405,7 +410,6 @@ class Participantes:
     def dpto_Seleccionado(self, event=None):
         '''Carga las ciudades según el departamento seleccionado'''
         # Primero, se limpia la lista de ciudades
-        self.idDpto = self.leer_idDpto()
         self.entryCiudad.set("")
         self.entryCiudad['values'] = []
         # Luego, se carga la lista de ciudades según el departamento seleccionado
@@ -444,23 +448,14 @@ class Participantes:
             # Se insertan los datos en la tabla
             self.treeDatos.insert('',0, text = row[0], values = [row[1],ciudad,row[2],row[3],row[4],row[5]])
 
-    def leer_idDpto(self):
-        '''Lee el Id del departamento seleccionado'''
-        
-        # Busca en la db el id del departamento seleccionado
-        query = 'SELECT Id_Departamento FROM t_ciudades WHERE Nombre_Departamento = ?'
-        parametro = (self.entryDpto.get(),)
-        db_rows = self.run_Query(query, parametro)
-        id_dpto = [row[0] for row in db_rows][0]
-        return id_dpto
-
     def leer_idCiudad(self):
         '''Lee el Id de la ciudad seleccionada'''
         
         # Busca en la db el id de la ciudad seleccionada
-        query = f"SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ? AND Id_Ciudad LIKE '{self.idDpto}%'"
+        query = 'SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ?'
         parametro = (self.entryCiudad.get(),)
         db_rows = self.run_Query(query, parametro)
+  
         # Retorna el id de la ciudad y lo retorna para guardarlo o actualizarlo en la tabla t_participantes
         for row in db_rows: return row[0]
 
