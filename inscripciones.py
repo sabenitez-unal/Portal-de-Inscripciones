@@ -253,8 +253,10 @@ class Participantes:
                     mssg.showerror('¡Atención!','... ¡Máximo 15 caracteres! ...')
                     self.entryId.delete(15,"end")
             # Si no es un número, borra el último caracter
-            except: self.entryId.delete(len(self.entryId.get())-1, 'end')
-        # Si se pega un texto, se valida que sea un número y que no se exceda la longitud de 15 caracteres
+            except: 
+                for i, char in enumerate(self.entryId.get()):
+                    if not char.isdigit(): self.entryId.delete(len(self.entryId.get())-1, 'end')
+            # Si se pega un texto, se valida que sea un número y que no se exceda la longitud de 15 caracteres
         else: self.entryId.delete(15,"end")
 
     def valida_Fecha(self, event=None, btn_pressed=False):
