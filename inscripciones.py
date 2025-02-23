@@ -326,7 +326,7 @@ class Participantes:
                 self.entryCelular.delete(10, 'end')  
         # Si no es un número, lo borra.
         except: 
-            for i, char in enumerate(self.entryCelular.get()):
+            for char in self.entryCelular.get():
                 if not char.isdigit(): self.entryCelular.delete(len(self.entryCelular.get())-1, 'end')
 
     def carga_Datos(self):
@@ -355,7 +355,7 @@ class Participantes:
         id_ciudad = [row[0] for row in db_rows][0]
         
         # Si hay un id de ciudad, se cargan los datos
-        if id_ciudad != None:
+        if id_ciudad:
             # Cargando los datos de la DB para el departamento según el id de la ciudad
             query = 'SELECT Nombre_Departamento FROM t_ciudades WHERE Id_Ciudad = ?'
             parametro = (id_ciudad,)
