@@ -163,7 +163,7 @@ class Participantes:
         self.btnEliminar = ttk.Button(self.win, text="Eliminar", width="8", style="TButton", command=self.elimina_Registro, takefocus=False)
         self.btnEliminar.place(anchor="nw", rely="0.75", x="154", y="80")
         # Botón Cancelar
-        self.btnCancelar = ttk.Button(self.win, style="TButton", width="8", text="Cancelar", command = lambda:[self.limpia_Campos(), self.lee_tablaTreeView()],takefocus=False)
+        self.btnCancelar = ttk.Button(self.win, style="TButton", width="8", text="Cancelar", command=lambda:[self.limpia_Campos(), self.lee_tablaTreeView()],takefocus=False)
         self.btnCancelar.place(anchor="nw", rely="0.75", x="228", y="80")
         # Botón Seleccionar todos los participantes
         self.btnSeleccion = ttk.Button(self.win, text="Seleccionar todo", width="18",command=self.selec_Todo, style="TButton", takefocus=False)
@@ -256,7 +256,7 @@ class Participantes:
                     self.entryId.delete(15,"end")
             # Si no es un número, borra el último caracter
             except: 
-                for i, char in enumerate(self.entryId.get()):
+                for char in self.entryId.get():
                     if not char.isdigit(): self.entryId.delete(len(self.entryId.get())-1, 'end')
             # Si se pega un texto, se valida que sea un número y que no se exceda la longitud de 15 caracteres
         else: self.entryId.delete(15,"end")
@@ -483,7 +483,7 @@ class Participantes:
         '''Adiciona un producto a la BD si la validación es True'''
 
         # Actualiza un registro si la variable actualiza es True
-        if self.actualiza and self.valida_Fecha(btn_pressed=True):
+        if self.actualiza:
             self.entryId.configure(state = 'readonly')
 
             # Valida que si hay dpto seleccionado, también haya ciudad seleccionada
@@ -601,11 +601,11 @@ class Participantes:
 
         # Añade los parámetros a la consulta si se ingresaron
         if id_partic:
-            query += ' AND Id = ?'   
-            parametros.append(id_partic)
+            query += f" AND Id = ?"
+            parametros.append(id_partic)   
 
         if fecha != "DD/MM/AAAA":  
-            query += ' AND Fecha = ?'
+            query += f" AND Fecha = ?"
             parametros.append(fecha)
 
         # Usa leer_idCiudad() para obtener el ID de la ciudad si el usuario ingresó una ciudad
@@ -627,8 +627,15 @@ class Participantes:
                 parametros.extend(id_ciudades)
            
         if nombre:
-            query += ' AND Nombre = ?'
-            parametros.append(nombre)
+            query2 = f"SELECT Nombre FROM t_participantes WHERE Nombre LIKE '{nombre}%'"
+            nombres = self.run_Query(query2)
+            first_name = True
+            for row in nombres:
+                if first_name: query += f" AND (Nombre = ?"
+                else: query += f" OR Nombre = ?"
+                parametros.append(row[0])
+                first_name = False
+            query += f")"
 
         # Ejecutar la consulta con los parámetros
         resultado = (self.run_Query(query, tuple(parametros))).fetchall()
