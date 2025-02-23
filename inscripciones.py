@@ -456,7 +456,7 @@ class Participantes:
         query = 'SELECT Id_Departamento FROM t_ciudades WHERE Nombre_Departamento = ?'
         parametro = (self.entryDpto.get(),)
         db_rows = self.run_Query(query, parametro)
-        id_dpto = [row[0] for row in db_rows][0]
+        id_dpto = [row[0] for row in db_rows][0] if self.entryDpto.get() != "" else ""
         return id_dpto
 
     def leer_idCiudad(self):
