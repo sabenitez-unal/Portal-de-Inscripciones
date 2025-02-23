@@ -36,7 +36,7 @@ class Participantes:
         self.style.map("TButton", background=[("active", "#f0f4c3")], foreground=[("active", "#33691e")])
         # Configuración del estilo para los labels
         self.style.configure("Treeview", font=("Cambria", 9), rowheight=25, background="#dcedc8", foreground="black", relief="flat")
-        self.style.configure("Treeview.Heading", font=("Ancizar Sans", 11, "bold"), 
+        self.style.configure("Treeview.Heading", font=('Cambria', 11, "bold"), 
                              background="#e9f7ef", foreground="black", borderwidth=0, relief="flat")
         self.style.layout("Treeview", [('Treeview.Heading', {'sticky': 'nswe'})])
         self.style.configure("TFrame", background="#dcedc8", relief="solid", borderwidth=1, 
@@ -58,7 +58,7 @@ class Participantes:
         self.frm_Titulo.place(anchor="nw", relx="0.01", rely="0.01", x="1", y="0")
         # Label del título
         self.lblTitulo = ttk.Label(self.frm_Titulo)
-        self.lblTitulo.configure(anchor="center", font=("Ancizar Sans", 14, "bold"), justify="center", text="Inscripción de Participantes", style="TLabel")
+        self.lblTitulo.configure(anchor="center", font=('Cambria', 14, "bold"), justify="center", text="Inscripción de Participantes", style="TLabel")
         self.lblTitulo.place(anchor="center", relx="0.5", rely="0.5")
         
         #Label Frame
@@ -253,8 +253,10 @@ class Participantes:
                     mssg.showerror('¡Atención!','... ¡Máximo 15 caracteres! ...')
                     self.entryId.delete(15,"end")
             # Si no es un número, borra el último caracter
-            except: self.entryId.delete(len(self.entryId.get())-1, 'end')
-        # Si se pega un texto, se valida que sea un número y que no se exceda la longitud de 15 caracteres
+            except: 
+                for i, char in enumerate(self.entryId.get()):
+                    if not char.isdigit(): self.entryId.delete(len(self.entryId.get())-1, 'end')
+            # Si se pega un texto, se valida que sea un número y que no se exceda la longitud de 15 caracteres
         else: self.entryId.delete(15,"end")
 
     def valida_Fecha(self, event=None, btn_pressed=False):
@@ -321,7 +323,9 @@ class Participantes:
                 mssg.showerror('¡Atención!', 'Máximo 10 dígitos')
                 self.entryCelular.delete(10, 'end')  
         # Si no es un número, lo borra.
-        except: self.entryCelular.delete(len(self.entryCelular.get())-1, 'end')
+        except: 
+            for i, char in enumerate(self.entryCelular.get()):
+                if not char.isdigit(): self.entryCelular.delete(len(self.entryCelular.get())-1, 'end')
 
     def carga_Datos(self):
         ''' Carga los datos en los campos desde el treeView'''
