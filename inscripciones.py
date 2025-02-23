@@ -12,20 +12,20 @@ class Participantes:
     path = str(Path.Path(__file__).parent)
     db_name = path + r'\Participantes.db'
     actualiza = None
-    def __init__(self, master=None):
+    def __init__(self):
 
-        # Top Level - Ventana Principal
-        self.win = tk.Tk() if master is None else tk.Toplevel()      
-             
+        # Ventana Principal
+        self.win = tk.Tk()
+
         #Top Level - Configuración
         self.win.configure(background="#c5e1a5", height="480", relief="flat", width="1024")
-        self.win.geometry("1024x480")
-        self.centrar_ventana()
-        self.path = self.path + r'\cubo.ico'
-        self.win.iconbitmap(self.path)
-        self.win.resizable(False, False)
-        self.win.title("Portal de Inscripciones")
-        self.win.pack_propagate(0) 
+        self.win.geometry("1024x480")           # Tamaño de la ventana
+        self.centrar_ventana()                  # Centra la ventana en la pantalla
+        self.path = self.path + r'\cubo.ico'    # Icono de la ventana
+        self.win.iconbitmap(self.path)          # Asigna el icono a la ventana
+        self.win.resizable(False, False)        # No permite redimensionar la ventana
+        self.win.title("Portal de Inscripciones") # Título de la ventana
+        self.win.pack_propagate(0)              # No permite que los widgets cambien de tamaño
 
         # Configuración del estilo de los widgets
         self.style = ttk.Style()
@@ -36,17 +36,14 @@ class Participantes:
         self.style.map("TButton", background=[("active", "#f0f4c3")], foreground=[("active", "#33691e")])
         # Configuración del estilo para los labels
         self.style.configure("Treeview", font=("Cambria", 9), rowheight=25, background="#dcedc8", foreground="black", relief="flat")
-        self.style.configure("Treeview.Heading", font=('Cambria', 11, "bold"), 
-                             background="#e9f7ef", foreground="black", borderwidth=0, relief="flat")
+        self.style.configure("Treeview.Heading", font=('Cambria', 11, "bold"), background="#e9f7ef", foreground="black",   borderwidth=0, relief="flat")
         self.style.layout("Treeview", [('Treeview.Heading', {'sticky': 'nswe'})])
         self.style.configure("TFrame", background="#dcedc8", relief="solid", borderwidth=1, 
                              bordercolor="#aed581", textbackground="#dcedc8", textforeground="#33691e")
         # Configuración del estilo para los combobox
         self.style.configure("TCombobox", fieldbackground="white", background="white", foreground="black")
-        self.style.map("TCombobox", fieldbackground=[("readonly", "white")], selectbackground=[("readonly", "white")], 
-                       selectforeground=[("readonly", "black")])
-        self.style.map("TCombobox", selectbackground=[("active", "white")], selectforeground=[("active", "white")])
-        self.style.map("TCombobox", fieldbackground=[("disabled", "dark sea green")])
+        self.style.map("TCombobox", fieldbackground=[("readonly", "white")], selectbackground=[("readonly", "white")],  selectforeground=[("readonly", "black")])
+        self.style.map("TCombobox", selectbackground=[("active", "white")], selectforeground=[("active", "white")], fieldbackground=[("disabled", "dark sea green")])
         
         # Main widget
         self.mainwindow = self.win
@@ -111,7 +108,7 @@ class Participantes:
         self.lblCiudad.configure(anchor="e", justify="left", text="Ciudad", style="TLabel", width="12")
         self.lblCiudad.grid(column="0", padx="5", pady="15", row="3", sticky="w")
         # Entry Ciudad
-        self.entryCiudad = ttk.Combobox(self.frm_Datos, values=[])
+        self.entryCiudad = ttk.Combobox(self.frm_Datos)
         self.entryCiudad.configure(exportselection="true", justify="left", width="27", state='disabled', style="TCombobox")
         self.entryCiudad.grid(column="1", row="3", sticky="w")
         
@@ -315,7 +312,7 @@ class Participantes:
     def reescribir_fecha(self,event):
         '''Reescribe el texto del formato de fecha si el usuario no ha escrito nada'''
 
-        if len(self.entryFecha.get())== 0:
+        if len(self.entryFecha.get()) == 0:
             self.entryFecha.insert(0,"DD/MM/AAAA")
             self.entryFecha.configure(foreground="gray55")
         
@@ -410,7 +407,6 @@ class Participantes:
     def dpto_Seleccionado(self, event=None):
         '''Carga las ciudades según el departamento seleccionado'''
         # Primero, se limpia la lista de ciudades
-        self.idDpto = self.leer_idDpto()
         self.entryCiudad.set("")
         self.entryCiudad['values'] = []
         # Luego, se carga la lista de ciudades según el departamento seleccionado
@@ -461,9 +457,12 @@ class Participantes:
 
     def leer_idCiudad(self):
         '''Lee el Id de la ciudad seleccionada'''
-        
+
+        # Busca en la db el id del departamento seleccionado
+        self.idDpto = self.leer_idDpto()
         # Busca en la db el id de la ciudad seleccionada
-        query = f"SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ? AND Id_Ciudad LIKE '{self.idDpto}%'"
+        if self.idDpto != "": query = f"SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ? AND Id_Ciudad LIKE '{self.idDpto}%'"
+        else: query = 'SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ?'
         parametro = (self.entryCiudad.get(),)
         db_rows = self.run_Query(query, parametro)
   
@@ -485,19 +484,27 @@ class Participantes:
 
         # Actualiza un registro si la variable actualiza es True
         if self.actualiza and self.valida_Fecha(btn_pressed=True):
-            self.actualiza = None
             self.entryId.configure(state = 'readonly')
 
-            # Se actualiza el registro
-            query = 'UPDATE t_participantes SET Id = ?, Nombre = ?, Direccion = ?, Celular = ?, Entidad = ?, Fecha = ?, Id_Ciudad = ? WHERE Id = ?'
-            parametros = (self.entryId.get(), self.entryNombre.get(), self.entryDireccion.get(),
-                        self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), 
-                        self.leer_idCiudad(), self.entryId.get())
-            self.run_Query(query, parametros)
+            # Valida que si hay dpto seleccionado, también haya ciudad seleccionada
+            if self.entryDpto.get() and not self.entryCiudad.get():
+                mssg.showwarning("¡Atención!","Si selecciona un departamento, debe seleccionar una ciudad")
+            # Actualiza el registro si la fecha es válida
+            elif self.valida_Fecha(btn_pressed=True):
+                self.actualiza = None
+                # Se actualiza el registro
+                query = 'UPDATE t_participantes SET Id = ?, Nombre = ?, Direccion = ?, Celular = ?, Entidad = ?, Fecha = ?, Id_Ciudad = ? WHERE Id = ?'
+                parametros = (self.entryId.get(), self.entryNombre.get(), self.entryDireccion.get(),
+                            self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), 
+                            self.leer_idCiudad(), self.entryId.get())
+                self.run_Query(query, parametros)
 
-            # Se muestra un mensaje de confirmación
-            mssg.showinfo('Ok',' Registro actualizado con éxito')
-            self.limpia_Campos()
+                # Se muestra un mensaje de confirmación
+                mssg.showinfo('Ok',' Registro actualizado con éxito')
+                self.limpia_Campos()
+            # Si la fecha no es válida, se muestra un mensaje de error
+            else:
+                mssg.showerror("¡ Atención !","Debe completar el campo de fecha con una fecha valida en formato DD/MM/AAAA")
 
         # Adiciona un nuevo registro si la variable actualiza es False
         else:
@@ -505,8 +512,12 @@ class Participantes:
             query = 'INSERT INTO t_participantes VALUES(?, ?, ?, ?, ?, ?, ?)'
             parametros = (self.entryId.get(), self.entryNombre.get(), self.entryDireccion.get(),
                           self.entryCelular.get(), self.entryEntidad.get(), self.entryFecha.get(), self.leer_idCiudad())
+            
+            # Valida que si hay dpto seleccionado, también haya ciudad seleccionada
+            if self.entryDpto.get() and not self.entryCiudad.get():
+                mssg.showwarning("¡Atención!","Si selecciona un departamento, debe seleccionar una ciudad")
             # Valida que el Id no esté vacío y la fecha sea valida
-            if self.valida() and self.valida_Fecha(btn_pressed=True):
+            elif self.valida() and self.valida_Fecha(btn_pressed=True):
                 # Intenta insertar el registro
                 try:
                     self.run_Query(query, parametros)
