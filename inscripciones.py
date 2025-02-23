@@ -184,13 +184,13 @@ class Participantes:
        # Etiquetas de las columnas
         self.treeDatos["columns"]=("Nombre","Ciudad","Dirección","Celular","Entidad","Fecha")
         # Determina el espacio a mostrar que ocupa el código
-        self.treeDatos.column('#0',         anchor="w", stretch="true", width=60)
-        self.treeDatos.column('Nombre',     stretch="true",             width=60)
-        self.treeDatos.column('Ciudad',     stretch="true",             width=40)
-        self.treeDatos.column('Dirección',  stretch="true",             width=65)
-        self.treeDatos.column('Celular',    stretch="true",             width=30)
-        self.treeDatos.column('Entidad',    stretch="true",             width=60)
-        self.treeDatos.column('Fecha',      stretch="true",             width=25) 
+        self.treeDatos.column('#0',         anchor='w', stretch="false", width=100)
+        self.treeDatos.column('Nombre',     stretch="false",             width=100)
+        self.treeDatos.column('Ciudad',     stretch="false",             width=100)
+        self.treeDatos.column('Dirección',  stretch="false",             width=100)
+        self.treeDatos.column('Celular',    stretch="false",             width=100)
+        self.treeDatos.column('Entidad',    stretch="false",             width=100)
+        self.treeDatos.column('Fecha',      stretch="false",             width=100) 
         # Encabezados de las columnas de la pantalla
         self.treeDatos.heading('#0',       text = 'Id')
         self.treeDatos.heading('Nombre',   text = 'Nombre')
