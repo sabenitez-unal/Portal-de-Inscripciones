@@ -21,7 +21,7 @@ class Participantes:
         self.win.configure(background="#c5e1a5", height="480", relief="flat", width="1024")
         self.win.geometry("1024x480")
         self.centrar_ventana()
-        self.path = self.path +r'\cubo.ico'
+        self.path = self.path + r'\cubo.ico'
         self.win.iconbitmap(self.path)
         self.win.resizable(False, False)
         self.win.title("Portal de Inscripciones")
@@ -60,7 +60,7 @@ class Participantes:
 
         #Label Id
         self.lblId = ttk.Label(self.lblfrm_Datos)
-        self.lblId.configure(anchor="e", font="TkTextFont", justify="left", text="Idenficación", style="TLabel")
+        self.lblId.configure(anchor="e", font="TkTextFont", justify="left", text="Identificación", style="TLabel")
         self.lblId.configure(width="12")
         self.lblId.grid(column="0", padx="5", pady="15", row="0", sticky="w")
         
@@ -88,6 +88,7 @@ class Participantes:
         self.lblDpto.grid(column="0", padx="3", pady="15", row="2", sticky="w")
 
         #Entry Departamento
+        self.dptos = ['']
         self.lee_Dptos()
         self.entryDpto = ttk.Combobox(self.lblfrm_Datos, values=self.dptos)
         self.entryDpto.configure(exportselection="true", justify="left", width="27", state='readonly', style="TCombobox")
@@ -172,16 +173,16 @@ class Participantes:
         self.btnCancelar.place(anchor="nw", rely="0.75", x="228", y="80")
 
         #Botón Seleccionar todos los participantes
-        self.btnCerrarV = ttk.Button(self.win, text="Seleccionar todo", width="18",command=self.selec_Todo, style="TButton", takefocus=False)
-        self.btnCerrarV.place(anchor="nw", rely="0.75", x="585", y="80")
+        self.btnSeleccion = ttk.Button(self.win, text="Seleccionar todo", width="18",command=self.selec_Todo, style="TButton", takefocus=False)
+        self.btnSeleccion.place(anchor="nw", rely="0.75", x="585", y="80")
 
         #Botón Consultar
         self.btnConsultar = ttk.Button(self.win, text="Consultar Datos", width="18",command=self.consulta_participantes, style="TButton", takefocus = False)
         self.btnConsultar.place(anchor="nw", rely="0.75", x="730", y="80")
 
         #Botón Cerrar Ventana
-        self.btnCerrarV = ttk.Button(self.win, text="Finalizar Inscripción", width="18",command=self.win.destroy, style="TButton")
-        self.btnCerrarV.place(anchor="nw", rely="0.75", x="875", y="80")
+        self.btnSalir = ttk.Button(self.win, text="Finalizar Inscripción", width="18",command=self.win.destroy, style="TButton")
+        self.btnSalir.place(anchor="nw", rely="0.75", x="875", y="80")
 
 
         self.treeDatos = ttk.Treeview(self.win, selectmode="extended", style="Treeview")
@@ -221,30 +222,29 @@ class Participantes:
             
     def arrastre_seleccion(self, event):
         '''Permite la selección de múltiples elementos al arrastrar el mouse.'''
-        id_fila = self.treeDatos.identify_row(event.y)  # captura un evento si el cursor se arrasta sobre el treview
-        if id_fila:
-            self.treeDatos.selection_add(id_fila) 
-     
+        id_fila = self.treeDatos.identify_row(event.y)  # captura un evento si el cursor se arrastra sobre el treview
+        if id_fila and id_fila != '':  # Verifica que id_fila no esté vacío
+            self.treeDatos.selection_add(id_fila)  # selecciona la fila si el cursor se arrastra sobre ella
 
     def selec_Todo(self):
         '''Selecciona todos los elementos del Treeview.'''
-        for item in self.treeDatos.get_children():
-            self.treeDatos.selection_add(item)
+        # Selecciona todos los elementos del Treeview
+        for item in self.treeDatos.get_children(): self.treeDatos.selection_add(item) 
         mssg.showinfo("Info", "Todos los elementos han sido seleccionados") 
 
 
     def centrar_ventana(self):
-            ''' Centra la ventana en la pantalla '''
-            self.win.update_idletasks()  # Asegura que la ventana tenga las dimensiones correctas
-            screen_width = self.win.winfo_screenwidth()
-            screen_height = self.win.winfo_screenheight()
-            window_width = self.win.winfo_width()
-            window_height = self.win.winfo_height()
+        ''' Centra la ventana en la pantalla '''
+        self.win.update_idletasks()  # Asegura que la ventana tenga las dimensiones correctas
+        screen_width = self.win.winfo_screenwidth()
+        screen_height = self.win.winfo_screenheight()
+        window_width = self.win.winfo_width()
+        window_height = self.win.winfo_height()
     
-            posicion_x = (screen_width - window_width) // 2
-            posicion_y = (screen_height - window_height) // 2
+        posicion_x = (screen_width - window_width) // 2
+        posicion_y = (screen_height - window_height) // 2
 
-            self.win.geometry(f"{window_width}x{window_height}+{posicion_x}+{posicion_y}")
+        self.win.geometry(f"{window_width}x{window_height}+{posicion_x}+{posicion_y}")
  
     def valida(self):
         '''Valida que el Id no esté vacio, devuelve True si ok'''
@@ -404,12 +404,12 @@ class Participantes:
         # Seleccionando los datos de la DB
         query = 'SELECT Nombre_Departamento FROM t_ciudades ORDER BY Nombre_Departamento'
         db_rows = self.run_Query(query)
-        self.dptos = ['']
         # Se obtienen los departamentos de la DB
         for row in db_rows: self.dptos.append(row[0]) if row[0] != self.dptos[-1] else None
         self.dptos.remove('')
 
     def dpto_Seleccionado(self, event=None):
+        '''Carga las ciudades según el departamento seleccionado'''
         # Primero, se limpia la lista de ciudades
         self.entryCiudad.set("")
         self.entryCiudad['values'] = []
