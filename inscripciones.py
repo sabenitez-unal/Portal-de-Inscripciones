@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 import tkinter as tk
 import tkinter.ttk as ttk
-from tkinter import font
 from tkinter import messagebox as mssg
 import sqlite3
 import pathlib as Path
@@ -37,7 +36,7 @@ class Participantes:
         self.style.map("TButton", background=[("active", "#f0f4c3")], foreground=[("active", "#33691e")])
         # Configuración del estilo para los labels
         self.style.configure("Treeview", font=("Cambria", 9), rowheight=25, background="#dcedc8", foreground="black", relief="flat")
-        self.style.configure("Treeview.Heading", font=('Ancizar Sans', 11, "bold"), 
+        self.style.configure("Treeview.Heading", font=('Cambria', 11, "bold"), 
                              background="#e9f7ef", foreground="black", borderwidth=0, relief="flat")
         self.style.layout("Treeview", [('Treeview.Heading', {'sticky': 'nswe'})])
         self.style.configure("TFrame", background="#dcedc8", relief="solid", borderwidth=1, 
@@ -59,7 +58,7 @@ class Participantes:
         self.frm_Titulo.place(anchor="nw", relx="0.01", rely="0.01", x="1", y="0")
         # Label del título
         self.lblTitulo = ttk.Label(self.frm_Titulo)
-        self.lblTitulo.configure(anchor="center", font=('Ancizar Sans', 14, "bold"), justify="center", text="Inscripción de Participantes", style="TLabel")
+        self.lblTitulo.configure(anchor="center", font=('Cambria', 14, "bold"), justify="center", text="Inscripción de Participantes", style="TLabel")
         self.lblTitulo.place(anchor="center", relx="0.5", rely="0.5")
         
         #Label Frame
