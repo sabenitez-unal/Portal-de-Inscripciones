@@ -32,7 +32,7 @@ class Participantes:
         self.style.theme_use("clam")
         self.style.configure("TLabel", font=("Helvetica", 8), background="#dcedc8", foreground="black")
         # Configuración del estilo para los botones
-        self.style.configure("TButton", font=("Helvetica", 10), background="#dcedc8", foreground="black", borderwidth=0, relief="flat")
+        self.style.configure("TButton", font=("Helvetica", 10), background="#dcedc8", foreground="black", borderwidth=0)
         self.style.map("TButton", background=[("active", "#f0f4c3")], foreground=[("active", "#33691e")])
         # Configuración del estilo para los labels
         self.style.configure("Treeview", font=("Cambria", 9), rowheight=25, background="#dcedc8", foreground="black", relief="flat")
@@ -71,6 +71,12 @@ class Participantes:
         self.frm_treeView.configure(height="428", relief="solid", width="710")
         self.frm_treeView.place(anchor="nw", relx="0.3", rely="0.01", x="0", y="0")
         self.frm_treeView.pack_propagate(0)
+
+
+        # Frame para los botones
+        self.frm_btn = tk.Frame(self.win, background = '#c5e1a5')
+        self.frm_btn.configure(width='1000', height='35', relief='flat')
+        self.frm_btn.place(anchor='sw', relx='0.01', rely='0.98', x='2')
 
         # Label Id
         self.lblId = ttk.Label(self.frm_Datos)
@@ -154,26 +160,26 @@ class Participantes:
         self.resetform_fecha()
                       
         # Botón Grabar
-        self.btnGrabar = ttk.Button(self.win, text="Grabar", width="8", style="TButton", command=self.adiciona_Registro, takefocus=False)
-        self.btnGrabar.place(anchor="nw", relx="0.01", rely="0.75", x="0", y="80")
+        self.btnGrabar = ttk.Button(self.frm_btn, text="Grabar", width="8", style="TButton", command=self.adiciona_Registro, takefocus=False)
+        self.btnGrabar.place(anchor="w", rely="0.5")
         # Botón Editar
-        self.btnEditar = ttk.Button(self.win, text="Editar", width="8", style="TButton", command=self.edita_tablaTreeView, takefocus=False)
-        self.btnEditar.place(anchor="nw", rely="0.75", x="82", y="80")
+        self.btnEditar = ttk.Button(self.frm_btn, text="Editar", width="8", style="TButton", command=self.edita_tablaTreeView, takefocus=False)
+        self.btnEditar.place(anchor="w", rely="0.5", relx='0.07', x="2")
         # Botón Eliminar
-        self.btnEliminar = ttk.Button(self.win, text="Eliminar", width="8", style="TButton", command=self.elimina_Registro, takefocus=False)
-        self.btnEliminar.place(anchor="nw", rely="0.75", x="154", y="80")
+        self.btnEliminar = ttk.Button(self.frm_btn, text="Eliminar", width="8", style="TButton", command=self.elimina_Registro, takefocus=False)
+        self.btnEliminar.place(anchor="w", rely="0.5", relx='0.14', x="4")
         # Botón Cancelar
-        self.btnCancelar = ttk.Button(self.win, style="TButton", width="8", text="Cancelar", command=lambda:[self.limpia_Campos(), self.lee_tablaTreeView()],takefocus=False)
-        self.btnCancelar.place(anchor="nw", rely="0.75", x="228", y="80")
+        self.btnCancelar = ttk.Button(self.frm_btn, style="TButton", width="8", text="Cancelar", command=lambda:[self.limpia_Campos(), self.lee_tablaTreeView()],takefocus=False)
+        self.btnCancelar.place(anchor="w", rely="0.5", relx='0.21', x="6")
         # Botón Seleccionar todos los participantes
-        self.btnSeleccion = ttk.Button(self.win, text="Seleccionar todo", width="18",command=self.selec_Todo, style="TButton", takefocus=False)
-        self.btnSeleccion.place(anchor="nw", rely="0.75", x="585", y="80")
+        self.btnSeleccion = ttk.Button(self.frm_btn, text="Seleccionar todo", width="18",command=self.selec_Todo, style="TButton", takefocus=False)
+        self.btnSeleccion.place(anchor="e", rely="0.5", relx='0.70', x="0")
         # Botón Consultar
-        self.btnConsultar = ttk.Button(self.win, text="Consultar Datos", width="18",command=self.consulta_participantes, style="TButton", takefocus = False)
-        self.btnConsultar.place(anchor="nw", rely="0.75", x="730", y="80")
+        self.btnConsultar = ttk.Button(self.frm_btn, text="Consultar Datos", width="18",command=self.consulta_participantes, style="TButton", takefocus = False)
+        self.btnConsultar.place(anchor="e", rely="0.5", relx='0.85', x="0")
         # Botón Cerrar Ventana
-        self.btnSalir = ttk.Button(self.win, text="Finalizar Inscripción", width="18",command=self.win.destroy, style="TButton")
-        self.btnSalir.place(anchor="nw", rely="0.75", x="875", y="80")
+        self.btnSalir = ttk.Button(self.frm_btn, text="Finalizar Inscripción", width="18",command=self.win.destroy, style="TButton")
+        self.btnSalir.place(anchor="e", rely="0.5", relx='1', x="0")
 
         # Treeview
         self.treeDatos = ttk.Treeview(self.frm_treeView, selectmode="extended", style="Treeview")
