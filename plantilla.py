@@ -30,14 +30,14 @@ class Participantes:
         # Configuración del estilo de los widgets
         self.style = ttk.Style()
         self.style.theme_use("clam")
-        self.style.configure("TLabel", font=("Helvetica", 14), background="#dcedc8", foreground="black")
+        self.style.configure("TLabel", font=("Helvetica", 8), background="#dcedc8", foreground="black")
 
         self.style.configure("TButton", font=("Helvetica", 10), background="#dcedc8", foreground="black", borderwidth=0, relief="flat")
         self.style.map("TButton", background=[("active", "#f0f4c3")], foreground=[("active", "#33691e")])
 
-        self.style.configure("Treeview", font=("Helvetica", 11), rowheight=25, background="#e9f7ef", foreground="black", relief="flat")
-        self.style.configure("Treeview.Heading", font=("Helvetica", 12, "bold"), background="#dcedc8", foreground="black", borderwidth=0, relief="flat")
-
+        self.style.configure("Treeview", font=("Cambria", 9), rowheight=25, background="#dcedc8", foreground="black", relief="flat")
+        self.style.configure("Treeview.Heading", font=("Arial Rounded MT", 11, "bold"), 
+                             background="#e9f7ef", foreground="black", borderwidth=0, relief="flat")
         self.style.layout("Treeview", [('Treeview.Heading', {'sticky': 'nswe'})])
         self.style.configure("TFrame", background="#dcedc8", relief="solid", borderwidth=1, bordercolor="#aed581", textbackground="#dcedc8", textforeground="#33691e")
         
@@ -52,103 +52,102 @@ class Participantes:
         self.mainwindow = self.win
         
         #Label Frame
-        self.lblfrm_Datos = ttk.LabelFrame(self.win, width= 600, height= 200, labelanchor= "n", style="TFrame")
+        self.frm_Datos = ttk.Frame(self.win, style="TFrame")
         #Configuración del Label Frame    
-        self.lblfrm_Datos.configure(height="410", relief="groove", text=" Inscripción ", width="330")
-        self.lblfrm_Datos.place(anchor="nw", relx="0.01", rely="0.05", width="280", x="0", y="0")
-        self.lblfrm_Datos.grid_propagate(0)
+        self.frm_Datos.configure(height="380", relief="solid", width="285")
+        self.frm_Datos.place(anchor="nw", relx="0.01", rely="0.10", x="1", y="5")
+        self.frm_Datos.grid_propagate(0)
+
+        # Frame treeView
+        self.frm_treeView = ttk.Frame(self.win, style="TFrame")
+        # Configuración del Frame treeView
+        self.frm_treeView.configure(height="428", relief="solid", width="710")
+        self.frm_treeView.place(anchor="nw", relx="0.3", rely="0.01", x="0", y="0")
+        self.frm_treeView.pack_propagate(0)
 
         #Label Id
-        self.lblId = ttk.Label(self.lblfrm_Datos)
-        self.lblId.configure(anchor="e", font="TkTextFont", justify="left", text="Identificación", style="TLabel")
-        self.lblId.configure(width="12")
+        self.lblId = ttk.Label(self.frm_Datos)
+        self.lblId.configure(anchor="e", justify="left", text="Identificación", style="TLabel", width="12")
         self.lblId.grid(column="0", padx="5", pady="15", row="0", sticky="w")
         
         #Entry Id
-        self.entryId = tk.Entry(self.lblfrm_Datos)
-        self.entryId.configure(exportselection="false", justify="left",relief="groove", takefocus=True, width="30")
+        self.entryId = ttk.Entry(self.frm_Datos)
+        self.entryId.configure(exportselection="false", justify="left", takefocus=True, width="30")
         self.entryId.grid(column="1", row="0", sticky="w")
         self.entryId.bind("<KeyRelease>", self.valida_Identificacion)
         
         #Label Nombre
-        self.lblNombre = ttk.Label(self.lblfrm_Datos)
-        self.lblNombre.configure(anchor="e", font="TkTextFont", justify="left", text="Nombre", style="TLabel")
-        self.lblNombre.configure(width="12")
+        self.lblNombre = ttk.Label(self.frm_Datos)
+        self.lblNombre.configure(anchor="e", justify="left", text="Nombre", style="TLabel", width="12")
         self.lblNombre.grid(column="0", padx="5", pady="15", row="1", sticky="w")
         
         #Entry Nombre
-        self.entryNombre = tk.Entry(self.lblfrm_Datos)
-        self.entryNombre.configure(exportselection="true", justify="left",relief="groove", width="30")
+        self.entryNombre = ttk.Entry(self.frm_Datos)
+        self.entryNombre.configure(exportselection="true", justify="left", width="30")
         self.entryNombre.grid(column="1", row="1", sticky="w")
 
         #Label Departamento
-        self.lblDpto = ttk.Label(self.lblfrm_Datos)
-        self.lblDpto.configure(anchor="e", font="TkTextFont", justify="left", text="Departamento", style="TLabel")
-        self.lblDpto.configure(width="13")
+        self.lblDpto = ttk.Label(self.frm_Datos)
+        self.lblDpto.configure(anchor="e", justify="left", text="Departamento", style="TLabel", width="13")
         self.lblDpto.grid(column="0", padx="3", pady="15", row="2", sticky="w")
 
         #Entry Departamento
         self.dptos = ['']
         self.lee_Dptos()
-        self.entryDpto = ttk.Combobox(self.lblfrm_Datos, values=self.dptos)
+        self.entryDpto = ttk.Combobox(self.frm_Datos, values=self.dptos)
         self.entryDpto.configure(exportselection="true", justify="left", width="27", state='readonly', style="TCombobox")
         self.entryDpto.grid(column="1", row="2", sticky="w")
         self.entryDpto.bind('<<ComboboxSelected>>', self.dpto_Seleccionado)
 
         #Label Ciudad
-        self.lblCiudad = ttk.Label(self.lblfrm_Datos)
-        self.lblCiudad.configure(anchor="e", font="TkTextFont", justify="left", text="Ciudad", style="TLabel")
-        self.lblCiudad.configure(width="12")
+        self.lblCiudad = ttk.Label(self.frm_Datos)
+        self.lblCiudad.configure(anchor="e", justify="left", text="Ciudad", style="TLabel", width="12")
         self.lblCiudad.grid(column="0", padx="5", pady="15", row="3", sticky="w")
 
         #Entry Ciudad
-        self.entryCiudad = ttk.Combobox(self.lblfrm_Datos, values=[])
+        self.entryCiudad = ttk.Combobox(self.frm_Datos, values=[])
         self.entryCiudad.configure(exportselection="true", justify="left", width="27", state='disabled', style="TCombobox")
         self.entryCiudad.grid(column="1", row="3", sticky="w")
         
         #Label Direccion
-        self.lblDireccion = ttk.Label(self.lblfrm_Datos)
-        self.lblDireccion.configure(anchor="e", font="TkTextFont", justify="left", text="Dirección", style="TLabel")
-        self.lblDireccion.configure(width="12")
+        self.lblDireccion = ttk.Label(self.frm_Datos)
+        self.lblDireccion.configure(anchor="e", justify="left", text="Dirección", style="TLabel", width="12")
         self.lblDireccion.grid(column="0", padx="5", pady="15", row="4", sticky="w")
         
         #Entry Direccion
-        self.entryDireccion = tk.Entry(self.lblfrm_Datos)
-        self.entryDireccion.configure(exportselection="true", justify="left",relief="groove", width="30")
+        self.entryDireccion = ttk.Entry(self.frm_Datos)
+        self.entryDireccion.configure(exportselection="true", justify="left", width="30")
         self.entryDireccion.grid(column="1", row="4", sticky="w")
         
         #Label Celular
-        self.lblCelular = ttk.Label(self.lblfrm_Datos)
-        self.lblCelular.configure(anchor="e", font="TkTextFont", justify="left", text="Celular", style="TLabel")
-        self.lblCelular.configure(width="12")
+        self.lblCelular = ttk.Label(self.frm_Datos)
+        self.lblCelular.configure(anchor="e", justify="left", text="Celular", style="TLabel", width="12")
         self.lblCelular.grid(column="0", padx="5", pady="15", row="5", sticky="w")
         
         #Entry Celular
-        self.entryCelular = tk.Entry(self.lblfrm_Datos)
-        self.entryCelular.configure(exportselection="false", justify="left",relief="groove", width="30")
+        self.entryCelular = ttk.Entry(self.frm_Datos)
+        self.entryCelular.configure(exportselection="false", justify="left", width="30")
         self.entryCelular.grid(column="1", row="5", sticky="w")
         self.entryCelular.bind('<KeyRelease>', self.valida_Celular)
         
         #Label Entidad
-        self.lblEntidad = ttk.Label(self.lblfrm_Datos)
-        self.lblEntidad.configure(anchor="e", font="TkTextFont", justify="left", text="Entidad", style="TLabel")
-        self.lblEntidad.configure(width="12")
+        self.lblEntidad = ttk.Label(self.frm_Datos)
+        self.lblEntidad.configure(anchor="e", justify="left", text="Entidad", style="TLabel", width="12")
         self.lblEntidad.grid(column="0", padx="5", pady="15", row="6", sticky="w")
         
         #Entry Entidad
-        self.entryEntidad = tk.Entry(self.lblfrm_Datos)
-        self.entryEntidad.configure(exportselection="true", justify="left",relief="groove", width="30")
+        self.entryEntidad = ttk.Entry(self.frm_Datos)
+        self.entryEntidad.configure(exportselection="true", justify="left", width="30")
         self.entryEntidad.grid(column="1", row="6", sticky="w")
         
         #Label Fecha
-        self.lblFecha = ttk.Label(self.lblfrm_Datos)
-        self.lblFecha.configure(anchor="e", font="TkTextFont", justify="left", text="Fecha", style="TLabel")
-        self.lblFecha.configure(width="12")
+        self.lblFecha = ttk.Label(self.frm_Datos)
+        self.lblFecha.configure(anchor="e", justify="left", text="Fecha", style="TLabel", width="12")
         self.lblFecha.grid(column="0", padx="5", pady="15", row="7", sticky="w")
         
         #Entry Fecha
-        self.entryFecha = tk.Entry(self.lblfrm_Datos,foreground="gray55")
-        self.entryFecha.configure(exportselection="true", justify="left",relief="groove", width="30")
+        self.entryFecha = ttk.Entry(self.frm_Datos,foreground="gray55")
+        self.entryFecha.configure(exportselection="true", justify="left", width="30")
         self.entryFecha.grid(column="1", row="7", sticky="w")
         # Valida fecha al escribir
         self.entryFecha.bind("<KeyRelease>", self.valida_Fecha)
@@ -184,9 +183,9 @@ class Participantes:
         self.btnSalir = ttk.Button(self.win, text="Finalizar Inscripción", width="18",command=self.win.destroy, style="TButton")
         self.btnSalir.place(anchor="nw", rely="0.75", x="875", y="80")
 
-
-        self.treeDatos = ttk.Treeview(self.win, selectmode="extended", style="Treeview")
-        self.treeDatos.place(x=380, y=0, height=480, width = 550)
+        #Treeview
+        self.treeDatos = ttk.Treeview(self.frm_treeView, selectmode="extended", style="Treeview")
+        self.treeDatos.place(anchor="center", relwidth="0.95", relheight="0.95", relx="0.49", rely="0.5")
 
        # Etiquetas de las columnas
         self.treeDatos["columns"]=("Nombre","Ciudad","Dirección","Celular","Entidad","Fecha")
@@ -198,7 +197,6 @@ class Participantes:
         self.treeDatos.column('Celular',    stretch="true",             width=16)
         self.treeDatos.column('Entidad',    stretch="true",             width=60)
         self.treeDatos.column('Fecha',      stretch="true",             width=25) 
-
        #Encabezados de las columnas de la pantalla
         self.treeDatos.heading('#0',       text = 'Id')
         self.treeDatos.heading('Nombre',   text = 'Nombre')
@@ -207,18 +205,14 @@ class Participantes:
         self.treeDatos.heading('Celular',  text = 'Celular')
         self.treeDatos.heading('Entidad',  text = 'Entidad')
         self.treeDatos.heading('Fecha',    text = 'Fecha')
-
         # Eventos para la selección múltiple
         self.treeDatos.bind("<B1-Motion>", self.arrastre_seleccion)
-
         #Scrollbar en el eje Y de treeDatos
-        self.scrollbar=ttk.Scrollbar(self.win, orient='vertical', command=self.treeDatos.yview)
+        self.scrollbar=ttk.Scrollbar(self.frm_treeView, orient='vertical', command=self.treeDatos.yview)
         self.treeDatos.configure(yscroll=self.scrollbar.set)
-        self.scrollbar.place(x=1000, y=33, height=390)
-
+        self.scrollbar.place(relx=0.99, rely=0.03, relheight=0.95, anchor='ne')
         #Carga los datos en treeDatos
         self.lee_tablaTreeView()    
-        self.treeDatos.place(anchor="nw", height="400", rely="0.1", width="700", x="295", y="-15")
             
     def arrastre_seleccion(self, event):
         '''Permite la selección de múltiples elementos al arrastrar el mouse.'''
