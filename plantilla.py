@@ -31,20 +31,22 @@ class Participantes:
         self.style = ttk.Style()
         self.style.theme_use("clam")
         self.style.configure("TLabel", font=("Helvetica", 14), background="#dcedc8", foreground="black")
-        self.style.configure("TButton", font=("Helvetica", 12), background="#dcedc8", foreground="black", borderwidth=0, relief="flat")
+
+        self.style.configure("TButton", font=("Helvetica", 10), background="#dcedc8", foreground="black", borderwidth=0, relief="flat")
         self.style.map("TButton", background=[("active", "#f0f4c3")], foreground=[("active", "#33691e")])
+
         self.style.configure("Treeview", font=("Helvetica", 11), rowheight=25, background="#e9f7ef", foreground="black", relief="flat")
         self.style.configure("Treeview.Heading", font=("Helvetica", 12, "bold"), background="#dcedc8", foreground="black", borderwidth=0, relief="flat")
+
         self.style.layout("Treeview", [('Treeview.Heading', {'sticky': 'nswe'})])
-        self.style.configure("TFrame", background="#dcedc8", relief="solid", borderwidth=1, 
-                            bordercolor="#aed581", textbackground="#dcedc8", textforeground="#33691e")
+        self.style.configure("TFrame", background="#dcedc8", relief="solid", borderwidth=1, bordercolor="#aed581", textbackground="#dcedc8", textforeground="#33691e")
         
         # Configuración del estilo para los combobox
         self.style.configure("TCombobox", fieldbackground="white", background="white", foreground="black")
         self.style.map("TCombobox", fieldbackground=[("readonly", "white")], selectbackground=[("readonly", "white")], 
                        selectforeground=[("readonly", "black")])
-        self.style.map("TCombobox", selectbackground=[("active", "#f0f4c3")], selectforeground=[("active", "#33691e")])
-        self.style.map("TCombobox", fieldbackground=[("disabled", "#c5e1a5")])
+        self.style.map("TCombobox", selectbackground=[("active", "white")], selectforeground=[("active", "white")])
+        self.style.map("TCombobox", fieldbackground=[("disabled", "dark sea green")])
         
         # Main widget
         self.mainwindow = self.win
@@ -154,34 +156,35 @@ class Participantes:
         self.resetform_fecha()
                       
         #Botón Grabar
-        self.btnGrabar = ttk.Button(self.win, text="Grabar", width="7", style="TButton", command=self.adiciona_Registro, takefocus=False)
+        self.btnGrabar = ttk.Button(self.win, text="Grabar", width="8", style="TButton", command=self.adiciona_Registro, takefocus=False)
         self.btnGrabar.place(anchor="nw", relx="0.01", rely="0.75", x="0", y="80")
+
         #Botón Editar
-        self.btnEditar = ttk.Button(self.win, text="Editar", width="7", style="TButton", command=self.edita_tablaTreeView, takefocus=False)
-        self.btnEditar.place(anchor="nw", rely="0.75", x="90", y="80")
+        self.btnEditar = ttk.Button(self.win, text="Editar", width="8", style="TButton", command=self.edita_tablaTreeView, takefocus=False)
+        self.btnEditar.place(anchor="nw", rely="0.75", x="82", y="80")
+
         #Botón Eliminar
-        self.btnEliminar = ttk.Button(self.win, text="Eliminar", width="7", style="TButton", command=self.elimina_Registro, takefocus=False)
-        self.btnEliminar.place(anchor="nw", rely="0.75", x="170", y="80")
+        self.btnEliminar = ttk.Button(self.win, text="Eliminar", width="8", style="TButton", command=self.elimina_Registro, takefocus=False)
+        self.btnEliminar.place(anchor="nw", rely="0.75", x="154", y="80")
+
         #Botón Cancelar
-        self.btnCancelar = ttk.Button(self.win, style="TButton", width="7", takefocus=False)
-        self.btnCancelar.configure(text="Cancelar", command = lambda:[self.limpia_Campos(), self.lee_tablaTreeView()])
-        self.btnCancelar.place(anchor="nw", rely="0.75", x="250", y="80")
+        self.btnCancelar = ttk.Button(self.win, style="TButton", width="8", text="Cancelar", command = lambda:[self.limpia_Campos(), self.lee_tablaTreeView()],takefocus=False)
+        self.btnCancelar.place(anchor="nw", rely="0.75", x="228", y="80")
+
+        #Botón Seleccionar todos los participantes
+        self.btnCerrarV = ttk.Button(self.win, text="Seleccionar todo", width="18",command=self.selec_Todo, style="TButton", takefocus=False)
+        self.btnCerrarV.place(anchor="nw", rely="0.75", x="585", y="80")
+
         #Botón Consultar
-        self.btnConsultar = ttk.Button(self.win)
-        self.btnConsultar.configure(text="Consultar Datos", width="18",command=self.consulta_participantes, style="TButton")
-        self.btnConsultar.place(anchor="nw", rely="0.75", x="660", y="80")
+        self.btnConsultar = ttk.Button(self.win, text="Consultar Datos", width="18",command=self.consulta_participantes, style="TButton", takefocus = False)
+        self.btnConsultar.place(anchor="nw", rely="0.75", x="730", y="80")
+
         #Botón Cerrar Ventana
-        self.btnCerrarV = ttk.Button(self.win)
-        self.btnCerrarV.configure(text="Finalizar Inscripción", width="18",command=self.win.destroy, style="TButton")
-        self.btnCerrarV.place(anchor="nw", rely="0.75", x="840", y="80")
+        self.btnCerrarV = ttk.Button(self.win, text="Finalizar Inscripción", width="18",command=self.win.destroy, style="TButton")
+        self.btnCerrarV.place(anchor="nw", rely="0.75", x="875", y="80")
 
-        #tablaTreeView
-        '''self.style=ttk.Style()
-        self.style.configure("estilo.Treeview", highlightthickness=0, bd=0, background='AliceBlue', font=('Calibri Light',10))
-        self.style.configure("Treeview.Heading", background='Azure', font=('Calibri Light', 10,'bold')) 
-        self.style.layout("estilo.Treeview", [('estilo.Treeview.treearea', {'sticky': 'nswe'})])'''
 
-        self.treeDatos = ttk.Treeview(self.win, style="Treeview")
+        self.treeDatos = ttk.Treeview(self.win, selectmode="extended", style="Treeview")
         self.treeDatos.place(x=380, y=0, height=480, width = 550)
 
        # Etiquetas de las columnas
@@ -189,11 +192,11 @@ class Participantes:
         # Determina el espacio a mostrar que ocupa el código
         self.treeDatos.column('#0',         anchor="w", stretch="true", width=20)
         self.treeDatos.column('Nombre',     stretch="true",             width=60)
-        self.treeDatos.column('Ciudad',     stretch="true",             width=60)
+        self.treeDatos.column('Ciudad',     stretch="true",             width=40)
         self.treeDatos.column('Dirección',  stretch="true",             width=60)
         self.treeDatos.column('Celular',    stretch="true",             width=16)
         self.treeDatos.column('Entidad',    stretch="true",             width=60)
-        self.treeDatos.column('Fecha',      stretch="true",             width=12) 
+        self.treeDatos.column('Fecha',      stretch="true",             width=25) 
 
        #Encabezados de las columnas de la pantalla
         self.treeDatos.heading('#0',       text = 'Id')
@@ -204,6 +207,9 @@ class Participantes:
         self.treeDatos.heading('Entidad',  text = 'Entidad')
         self.treeDatos.heading('Fecha',    text = 'Fecha')
 
+        # Eventos para la selección múltiple
+        self.treeDatos.bind("<B1-Motion>", self.arrastre_seleccion)
+
         #Scrollbar en el eje Y de treeDatos
         self.scrollbar=ttk.Scrollbar(self.win, orient='vertical', command=self.treeDatos.yview)
         self.treeDatos.configure(yscroll=self.scrollbar.set)
@@ -212,9 +218,23 @@ class Participantes:
         #Carga los datos en treeDatos
         self.lee_tablaTreeView()    
         self.treeDatos.place(anchor="nw", height="400", rely="0.1", width="700", x="295", y="-15")
+            
+    def arrastre_seleccion(self, event):
+        '''Permite la selección de múltiples elementos al arrastrar el mouse.'''
+        id_fila = self.treeDatos.identify_row(event.y)  # captura un evento si el cursor se arrasta sobre el treview
+        if id_fila:
+            self.treeDatos.selection_add(id_fila) 
+     
 
-    def centrar_ventana(self): #centra la ventana en el centro de la pantalla
-            """ Centra la ventana en la pantalla """
+    def selec_Todo(self):
+        '''Selecciona todos los elementos del Treeview.'''
+        for item in self.treeDatos.get_children():
+            self.treeDatos.selection_add(item)
+        mssg.showinfo("Info", "Todos los elementos han sido seleccionados") 
+
+
+    def centrar_ventana(self):
+            ''' Centra la ventana en la pantalla '''
             self.win.update_idletasks()  # Asegura que la ventana tenga las dimensiones correctas
             screen_width = self.win.winfo_screenwidth()
             screen_height = self.win.winfo_screenheight()
@@ -498,7 +518,7 @@ class Participantes:
     def edita_tablaTreeView(self, event=None):
         '''Edita un registro seleccionado de la tabla'''   
         # Valida que se haya seleccionado un registro
-        if self.treeDatos.selection():
+        if len(self.treeDatos.selection()) == 1:
             # Carga los campos desde la tabla TreeView
             self.treeDatos.item(self.treeDatos.selection())['text']
             
@@ -510,6 +530,9 @@ class Participantes:
             self.carga_Datos()
             self.lee_listaCiudades()
         # Si no se selecciona un registro, muestra un mensaje de error
+        elif len(self.treeDatos.selection()) > 1:
+            self.actualiza = None
+            mssg.showerror("¡ Atención !",'Solo puede editar un ítem de la tabla')
         else:
             self.actualiza = None
             mssg.showerror("¡ Atención !",'Por favor, seleccione un ítem de la tabla')
