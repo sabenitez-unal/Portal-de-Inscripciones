@@ -77,7 +77,7 @@ class Participantes:
 
         # Label Id
         self.lblId = ttk.Label(self.frm_Datos)
-        self.lblId.configure(anchor="e", justify="left", text="Identificación", style="TLabel", width="12")
+        self.lblId.configure(anchor="e", justify="left", text="Identificación *", style="TLabel", width="12")
         self.lblId.grid(column="0", padx="5", pady="15", row="0", sticky="w")
         # Entry Id
         self.entryId = ttk.Entry(self.frm_Datos)
@@ -145,7 +145,7 @@ class Participantes:
         
         # Label Fecha
         self.lblFecha = ttk.Label(self.frm_Datos)
-        self.lblFecha.configure(anchor="e", justify="left", text="Fecha", style="TLabel", width="12")
+        self.lblFecha.configure(anchor="e", justify="left", text="Fecha *", style="TLabel", width="12")
         self.lblFecha.grid(column="0", padx="5", pady="15", row="7", sticky="w")
         # Entry Fecha
         self.entryFecha = ttk.Entry(self.frm_Datos,foreground="gray55")
