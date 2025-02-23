@@ -184,11 +184,11 @@ class Participantes:
        # Etiquetas de las columnas
         self.treeDatos["columns"]=("Nombre","Ciudad","Dirección","Celular","Entidad","Fecha")
         # Determina el espacio a mostrar que ocupa el código
-        self.treeDatos.column('#0',         anchor="w", stretch="true", width=20)
+        self.treeDatos.column('#0',         anchor="w", stretch="true", width=60)
         self.treeDatos.column('Nombre',     stretch="true",             width=60)
         self.treeDatos.column('Ciudad',     stretch="true",             width=40)
-        self.treeDatos.column('Dirección',  stretch="true",             width=60)
-        self.treeDatos.column('Celular',    stretch="true",             width=16)
+        self.treeDatos.column('Dirección',  stretch="true",             width=65)
+        self.treeDatos.column('Celular',    stretch="true",             width=30)
         self.treeDatos.column('Entidad',    stretch="true",             width=60)
         self.treeDatos.column('Fecha',      stretch="true",             width=25) 
         # Encabezados de las columnas de la pantalla
@@ -249,7 +249,7 @@ class Participantes:
         if event.char:
             try:
                 int(self.entryId.get())
-                if len(self.entryId.get()) >= 15:
+                if len(self.entryId.get()) > 15:
                     mssg.showerror('¡Atención!','... ¡Máximo 15 caracteres! ...')
                     self.entryId.delete(15,"end")
             # Si no es un número, borra el último caracter
@@ -319,7 +319,7 @@ class Participantes:
 
         try: # Intenta convertir el texto a un número.
             int(self.entryCelular.get())
-            if len(self.entryCelular.get()) >= 10:
+            if len(self.entryCelular.get()) > 10:
                 mssg.showerror('¡Atención!', 'Máximo 10 dígitos')
                 self.entryCelular.delete(10, 'end')  
         # Si no es un número, lo borra.
@@ -405,6 +405,7 @@ class Participantes:
     def dpto_Seleccionado(self, event=None):
         '''Carga las ciudades según el departamento seleccionado'''
         # Primero, se limpia la lista de ciudades
+        self.idDpto = self.leer_idDpto()
         self.entryCiudad.set("")
         self.entryCiudad['values'] = []
         # Luego, se carga la lista de ciudades según el departamento seleccionado
@@ -443,14 +444,23 @@ class Participantes:
             # Se insertan los datos en la tabla
             self.treeDatos.insert('',0, text = row[0], values = [row[1],ciudad,row[2],row[3],row[4],row[5]])
 
+    def leer_idDpto(self):
+        '''Lee el Id del departamento seleccionado'''
+        
+        # Busca en la db el id del departamento seleccionado
+        query = 'SELECT Id_Departamento FROM t_ciudades WHERE Nombre_Departamento = ?'
+        parametro = (self.entryDpto.get(),)
+        db_rows = self.run_Query(query, parametro)
+        id_dpto = [row[0] for row in db_rows][0]
+        return id_dpto
+
     def leer_idCiudad(self):
         '''Lee el Id de la ciudad seleccionada'''
         
         # Busca en la db el id de la ciudad seleccionada
-        query = 'SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ?'
+        query = f"SELECT Id_Ciudad FROM t_ciudades WHERE Nombre_Ciudad = ? AND Id_Ciudad LIKE '{self.idDpto}%'"
         parametro = (self.entryCiudad.get(),)
         db_rows = self.run_Query(query, parametro)
-  
         # Retorna el id de la ciudad y lo retorna para guardarlo o actualizarlo en la tabla t_participantes
         for row in db_rows: return row[0]
 
