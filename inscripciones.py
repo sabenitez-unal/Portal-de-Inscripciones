@@ -567,7 +567,7 @@ class Participantes:
                 parametro = (self.treeDatos.item(registro)['text'],)
                 query = 'DELETE FROM t_participantes WHERE Id = ?'
                 self.run_Query(query, parametro)
-                self.limpia_Campos()
+            self.limpia_Campos()
             mssg.showinfo("", "¡El registro ha sido eliminado con éxito!")
         # Si no se selecciona un registro, muestra un mensaje de error
         else:
