@@ -633,6 +633,7 @@ class Participantes:
                 parametros.extend(id_ciudades)
            
         if nombre:
+            query_temp = query
             query2 = f"SELECT Nombre FROM t_participantes WHERE Nombre LIKE '{nombre}%'"
             nombres = self.run_Query(query2)
             first_name = True
@@ -641,7 +642,8 @@ class Participantes:
                 else: query += f" OR Nombre = ?"
                 parametros.append(row[0])
                 first_name = False
-            query += f")"
+            if query_temp != query: query += f")"
+            else: query += ' AND 1=2'
 
         # Ejecutar la consulta con los parámetros
         resultado = (self.run_Query(query, tuple(parametros))).fetchall()
