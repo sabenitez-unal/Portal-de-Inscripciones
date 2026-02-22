@@ -1,5 +1,3 @@
-# !/usr/bin/python3
-# -*- coding: utf-8 -*-
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import messagebox as mssg
@@ -10,7 +8,7 @@ from datetime import datetime as dt
 class Participantes:
     # nombre de la base de datos  y ruta 
     path = str(Path.Path(__file__).parent)
-    db_name = path + r'\Participantes.db'
+    db_name = path + r'/database/Participantes.db'
     actualiza = None
     def __init__(self):
 
@@ -21,8 +19,8 @@ class Participantes:
         self.win.configure(background="#c5e1a5", height="480", relief="flat", width="1024")
         self.win.geometry("1024x480")           # Tamaño de la ventana
         self.centrar_ventana()                  # Centra la ventana en la pantalla
-        self.path = self.path + r'\cubo.ico'    # Icono de la ventana
-        self.win.iconbitmap(self.path)          # Asigna el icono a la ventana
+        #self.path = self.path + r'/cubo.ico'    # Icono de la ventana
+        #self.win.iconbitmap(self.path)          # Asigna el icono a la ventana
         self.win.resizable(False, False)        # No permite redimensionar la ventana
         self.win.title("Portal de Inscripciones") # Título de la ventana
         self.win.pack_propagate(0)              # No permite que los widgets cambien de tamaño
